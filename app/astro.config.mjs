@@ -1,12 +1,10 @@
-import { defineConfig } from "astro/config";
-import electron from "astro-electron";
+import { defineConfig } from 'astro/config';
+import solidJs from "@astrojs/solid-js";
 
+import playformCompress from "@playform/compress";
+import playformInline from "@playform/inline";
+
+// https://astro.build/config
 export default defineConfig({
-    integrations: [electron({
-        main: {
-            entry: "src/electron/main.js", // Path to your Electron main file
-            vite: {}, // Vite-specific configurations (by default we use the same config as your Astro project)
-        }
-    }
-    )],
+  integrations: [solidJs(), playformInline(), playformCompress()]
 });
