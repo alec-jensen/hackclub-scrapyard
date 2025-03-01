@@ -1,12 +1,9 @@
-:: filepath: /c:/Users/brent/Documents/Programming Projects/HackClub/testing/run.bat
 @echo off
 setlocal EnableDelayedExpansion
 
 :: Enable ANSI escape sequences
-reg query HKCU\Console /v VirtualTerminalLevel >nul 2>&1 && goto :init
-reg add HKCU\Console /v VirtualTerminalLevel /t REG_DWORD /d 1 /f >nul 2>&1
+reg query HKCU\Console /v VirtualTerminalLevel >nul 2>&1 || reg add HKCU\Console /v VirtualTerminalLevel /t REG_DWORD /d 1 /f >nul 2>&1
 
-:init
 :: Color definitions
 set "GREEN=[32m"
 set "YELLOW=[33m"
@@ -21,26 +18,12 @@ for /f "tokens=1-3 delims=:." %%a in ("%TIME%") do (
 )
 set "hour=%hour: =%"
 
-:: Logging functions
-:log_main
-echo %GREEN%[%hour%.%minute%.%second%] [MAIN]: %~1%NC%
-goto :eof
-
-:log_warning
-echo %YELLOW%[%hour%.%minute%.%second%] [WARNING]: %~1%NC%
-goto :eof
-
-:log_error
-echo %RED%[%hour%.%minute%.%second%] [ERROR]: %~1%NC%
-goto :eof
-
-:main
-cls
-call :log_main "Starting application..."
+echo %GREEN%[%hour%.%minute%.%second%] [MAIN]: Starting application...%NC%
 
 :: Check if executable exists
-if not exist main.exe (
-    call :log_error "main.exe not found! Please build the project first."
+if not exist "build\main.exe" (
+    echo %RED%[%hour%.%minute%.%second%] [ERROR]: main.exe not found in build directory!%NC%
+    echo %YELLOW%[%hour%.%minute%.%second%] [WARNING]: Please run build.sh first.%NC%
     pause
     exit /b 1
 )
@@ -48,38 +31,14 @@ if not exist main.exe (
 :: Check if application is already running and kill it
 tasklist /FI "IMAGENAME eq main.exe" 2>NUL | find /I /N "main.exe">NUL
 if not errorlevel 1 (
-    call :log_warning "Application is already running. Closing previous instance..."
+    echo %YELLOW%[%hour%.%minute%.%second%] [WARNING]: Application is already running. Closing previous instance...%NC%
     taskkill /F /IM main.exe >NUL 2>&1
     timeout /t 1 >nul
 )
 
-:: Run the application with debug output
-call :log_main "Launching main.exe..."
-start "" main.exe
-if errorlevel 1 (
-    call :log_error "Failed to launch application! Error code: !errorlevel!"
-    pause
-    exit /b 1
-)
+:: Run the application with visible console window
+echo %GREEN%[%hour%.%minute%.%second%] [MAIN]: Launching main.exe with console window...%NC%
+start "Keyboard Middleware" cmd /k "cd /d %~dp0\build && main.exe"
 
-:: Wait for application to start
-timeout /t 2 >nul
-
-:: Monitor the application
-:loop
-tasklist /FI "IMAGENAME eq main.exe" 2>NUL | find /I /N "main.exe">NUL
-if errorlevel 1 (
-    call :log_warning "Application has stopped running."
-    goto :end
-)
-call :log_main "Application is running... Press Ctrl+C to exit"
-timeout /t 2 >nul
-goto :loop
-
-:end
-call :log_main "Cleaning up..."
-taskkill /F /IM main.exe >NUL 2>&1
-pause
-exit /b 0
-
-goto :main
+echo %GREEN%[%hour%.%minute%.%second%] [MAIN]: Application launched in a separate window.%NC%
+echo %YELLOW%[%hour%.%minute%.%second%] [WARNING]: Close that window to terminate the application.%NC%
