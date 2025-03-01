@@ -1,31 +1,57 @@
-// Example usage in main application
-#include "KeyboardMiddleware.h"
+#include "middleWhere.hpp"
+#include "Logger.hpp"
+#include <iostream>
+#include <chrono>
+#include <thread>
 
-// Define your hardware communication functions
-void SendToHardware(int counter) {
-    // Implement your hardware communication here
+// Mock hardware simulation
+class MockHardware {
+public:
+    static void simulateProgress(int target) {
+        AllocConsole();
+        freopen("CONOUT$", "w", stdout);
+        std::cout << "Target received: " << target << std::endl;
+        for(int i = 0; i < target; i++) {
+            std::cout << "Progress: " << i + 1 << "/" << target << "\r" << std::flush;
+            Sleep(100);
+        }
+        std::cout << "\nComplete!" << std::endl;
+    }
+};
+
+// Test callbacks
+void testSendToHardware(int counter) {
+    MockHardware::simulateProgress(counter);
 }
 
-bool ReceiveFromHardware() {
-    // Implement your hardware response handling here
-    return true; // or false based on hardware response
+bool testReceiveFromHardware() {
+    std::cout << "Hardware verification complete" << std::endl;
+    return true;
 }
 
-int main() {
-    // Initialize with restricted keys
-    std::vector<WORD> restrictedKeys = {'W', 'A', 'S', 'D', VK_SPACE};
-    KeyboardMiddleware::Initialize(restrictedKeys);
+int WINAPI WinMain([[maybe_unused]] HINSTANCE hInstance, [[maybe_unused]] HINSTANCE hPrevInstance, 
+    [[maybe_unused]] LPSTR lpCmdLine, [[maybe_unused]] int nCmdShow) {
+    if (!KeyboardMiddleware::Initialize()) {
+        // Using MessageBoxA for ANSI strings
+        MessageBoxA(NULL, "Middleware initialization failed!", "Error", MB_OK | MB_ICONERROR);
+        return 1;
+    }
 
-    // Register hardware callbacks
-    KeyboardMiddleware::RegisterHardwareCallbacks(SendToHardware, ReceiveFromHardware);
+    // Register each key with its own target counter
+    KeyboardMiddleware::RegisterKey('W', 5);  // W key needs 5 counts
+    KeyboardMiddleware::RegisterKey('A', 3);  // A key needs 3 counts
+    KeyboardMiddleware::RegisterKey('S', 7);  // S key needs 7 counts
+    KeyboardMiddleware::RegisterKey('D', 4);  // D key needs 4 countsy
+    KeyboardMiddleware::RegisterKey(VK_SPACE, 10);  // Space key needs 10 counts
 
-    // Set initial target counter
-    KeyboardMiddleware::SetTargetCounter(100);
+    KeyboardMiddleware::RegisterHardwareCallbacks(testSendToHardware, testReceiveFromHardware);
 
-    // Your main application loop here
-    // ...
+    MSG msg;
+    while (GetMessage(&msg, NULL, 0, 0)) {
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+    }
 
-    // Cleanup on exit
     KeyboardMiddleware::Cleanup();
     return 0;
 }
