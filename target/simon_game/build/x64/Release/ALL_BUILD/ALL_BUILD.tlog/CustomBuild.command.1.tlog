@@ -1,0 +1,10 @@
+^C:\USERS\ALECB\HACKCLUB-SCRAPYARD\SIMON_GAME_FFI\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/alecb/hackclub-scrapyard/simon_game_ffi -BC:/Users/alecb/hackclub-scrapyard/target/simon_game/build --check-stamp-file C:/Users/alecb/hackclub-scrapyard/target/simon_game/build/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

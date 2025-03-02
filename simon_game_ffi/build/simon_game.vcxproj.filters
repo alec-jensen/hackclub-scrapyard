@@ -1,25 +1,25 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="C:\Users\brent\Documents\Programming Projects\HackClub\simon_game_ffi\src\SerialMonitor.cpp">
+    <ClCompile Include="C:\Users\alecb\hackclub-scrapyard\simon_game_ffi\src\SerialMonitor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\brent\Documents\Programming Projects\HackClub\simon_game_ffi\src\Logger.cpp">
+    <ClCompile Include="C:\Users\alecb\hackclub-scrapyard\simon_game_ffi\src\Logger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\brent\Documents\Programming Projects\HackClub\simon_game_ffi\src\middleWhere.cpp">
+    <ClCompile Include="C:\Users\alecb\hackclub-scrapyard\simon_game_ffi\src\middleWhere.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\brent\Documents\Programming Projects\HackClub\simon_game_ffi\src\ffi.cpp">
+    <ClCompile Include="C:\Users\alecb\hackclub-scrapyard\simon_game_ffi\src\ffi.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="C:\Users\brent\Documents\Programming Projects\HackClub\simon_game_ffi\CMakeLists.txt" />
+    <CustomBuild Include="C:\Users\alecb\hackclub-scrapyard\simon_game_ffi\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{C822E2EF-B096-39DE-8AF7-C3C0F1E5502A}</UniqueIdentifier>
+      <UniqueIdentifier>{7842F0CD-E3B3-3575-8E31-1E06DF1F79A0}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

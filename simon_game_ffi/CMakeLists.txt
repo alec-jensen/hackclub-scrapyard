@@ -3,10 +3,11 @@ project(simon_game_ffi)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/../app/src-tauri/target/simon_game")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/../app/src-tauri/target/simon_game")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/../app/src-tauri/target/simon_game")
 
 if(WIN32)
     add_definitions(-D_WIN32_WINNT=0x0601)
@@ -58,4 +59,10 @@ install(TARGETS simon_game
 )
 install(FILES include/simon_game.h
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+
+# copy dll to target/release and target/debug
+add_custom_command(TARGET simon_game POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:simon_game> "${CMAKE_SOURCE_DIR}/../app/src-tauri/target/release/simon_game.dll"
+    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:simon_game> "${CMAKE_SOURCE_DIR}/../app/src-tauri/target/debug/simon_game.dll"
 )

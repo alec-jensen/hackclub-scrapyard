@@ -1,0 +1,263 @@
+EXPORTS 
+	??_R0?AV?$_Func_base@XH@std@@@8 	 DATA
+	??_R0?AV?$_Func_base@_N$$V@std@@@8 	 DATA
+	??_R0?AV?$_Func_impl_no_alloc@P6AXH@ZXH@std@@@8 	 DATA
+	??_R0?AV?$_Func_impl_no_alloc@P6A_NXZ_N$$V@std@@@8 	 DATA
+	??_R0?AV?$_Iosb@H@std@@@8 	 DATA
+	??_R0?AV?$basic_filebuf@DU?$char_traits@D@std@@@std@@@8 	 DATA
+	??_R0?AV?$basic_ios@DU?$char_traits@D@std@@@std@@@8 	 DATA
+	??_R0?AV?$basic_iostream@DU?$char_traits@D@std@@@std@@@8 	 DATA
+	??_R0?AV?$basic_istream@DU?$char_traits@D@std@@@std@@@8 	 DATA
+	??_R0?AV?$basic_ofstream@DU?$char_traits@D@std@@@std@@@8 	 DATA
+	??_R0?AV?$basic_ostream@DU?$char_traits@D@std@@@std@@@8 	 DATA
+	??_R0?AV?$basic_ostringstream@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@8 	 DATA
+	??_R0?AV?$basic_streambuf@DU?$char_traits@D@std@@@std@@@8 	 DATA
+	??_R0?AV?$basic_stringbuf@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@8 	 DATA
+	??_R0?AV?$basic_stringstream@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@8 	 DATA
+	??_R0?AV_Generic_error_category@std@@@8 	 DATA
+	??_R0?AV_System_error@std@@@8 	 DATA
+	??_R0?AV_System_error_category@std@@@8 	 DATA
+	??_R0?AVbad_alloc@std@@@8 	 DATA
+	??_R0?AVbad_array_new_length@std@@@8 	 DATA
+	??_R0?AVbad_cast@std@@@8 	 DATA
+	??_R0?AVerror_category@std@@@8 	 DATA
+	??_R0?AVexception@std@@@8 	 DATA
+	??_R0?AVfilesystem_error@filesystem@std@@@8 	 DATA
+	??_R0?AVios_base@std@@@8 	 DATA
+	??_R0?AVruntime_error@std@@@8 	 DATA
+	??_R0?AVsystem_error@std@@@8 	 DATA
+	??_R0P6AXH@Z@8 	 DATA
+	??_R0P6A_NXZ@8 	 DATA
+	?_Psave@?$_Facetptr@V?$codecvt@DDU_Mbstatet@@@std@@@std@@2PEBVfacet@locale@2@EB 	 DATA
+	?_Static@?1???$_Immortalize_memcpy_image@V_Generic_error_category@std@@@std@@YAAEBV_Generic_error_category@1@XZ@4U?$_Constexpr_immortalize_impl@V_Generic_error_category@std@@@1@A 	 DATA
+	?_Static@?1???$_Immortalize_memcpy_image@V_System_error_category@std@@@std@@YAAEBV_System_error_category@1@XZ@4U?$_Constexpr_immortalize_impl@V_System_error_category@std@@@1@A 	 DATA
+	?_Stinit@?1??_Init@?$basic_filebuf@DU?$char_traits@D@std@@@std@@IEAAXPEAU_iobuf@@W4_Initfl@23@@Z@4U_Mbstatet@@A 	 DATA
+	?blockKeys@KeyboardMiddleware@@0U?$atomic@_N@std@@A 	 DATA
+	?counterMutex@KeyboardMiddleware@@0Vmutex@std@@A 	 DATA
+	?fileLoggingEnabled@Logger@@0U?$atomic@_N@std@@A 	 DATA
+	?keyConfigs@KeyboardMiddleware@@0V?$vector@UKeyConfig@KeyboardMiddleware@@V?$allocator@UKeyConfig@KeyboardMiddleware@@@std@@@std@@A 	 DATA
+	?keyboardHook@KeyboardMiddleware@@0PEAUHHOOK__@@EA 	 DATA
+	?logFile@Logger@@0V?$basic_ofstream@DU?$char_traits@D@std@@@std@@A 	 DATA
+	?logFilePath@Logger@@0V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@A 	 DATA
+	?logMutex@Logger@@0Vmutex@std@@A 	 DATA
+	?minLogLevel@Logger@@0U?$atomic@W4LogLevel@Logger@@@std@@A 	 DATA
+	?receiveFromHardwareCallback@KeyboardMiddleware@@0V?$function@$$A6A_NXZ@std@@A 	 DATA
+	?sendToHardwareCallback@KeyboardMiddleware@@0V?$function@$$A6AXH@Z@std@@A 	 DATA
+	?shouldExit@KeyboardMiddleware@@0_NA 	 DATA
+	?targetCounter@KeyboardMiddleware@@0U?$atomic@H@std@@A 	 DATA
+	??$?0V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@$0A@@path@filesystem@std@@QEAA@AEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@2@W4format@012@@Z
+	??$?6DU?$char_traits@D@std@@@std@@YAAEAV?$basic_ostream@DU?$char_traits@D@std@@@0@AEAV10@Vid@thread@0@@Z
+	??$?6DU?$char_traits@D@std@@D@std@@YAAEAV?$basic_ostream@DU?$char_traits@D@std@@@0@AEAV10@AEBU?$_Fillobj@D@0@@Z
+	??$?6DU?$char_traits@D@std@@V?$allocator@D@1@@std@@YAAEAV?$basic_ostream@DU?$char_traits@D@std@@@0@AEAV10@AEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@0@@Z
+	??$?6DU?$char_traits@D@std@@_J@std@@YAAEAV?$basic_ostream@DU?$char_traits@D@std@@@0@AEAV10@AEBU?$_Smanip@_J@0@@Z
+	??$?6U?$char_traits@D@std@@@std@@YAAEAV?$basic_ostream@DU?$char_traits@D@std@@@0@AEAV10@PEBD@Z
+	??$?HDU?$char_traits@D@std@@V?$allocator@D@1@@std@@YA?AV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@0@QEBD$$QEAV10@@Z
+	??$_Allocate_manually_vector_aligned@U_Default_allocate_traits@std@@@std@@YAPEAX_K@Z
+	??$_Atomic_address_as@DU?$_Atomic_padded@_N@std@@@std@@YAPECDAEAU?$_Atomic_padded@_N@0@@Z
+	??$_Atomic_address_as@DU?$_Atomic_padded@_N@std@@@std@@YAPEDDAEBU?$_Atomic_padded@_N@0@@Z
+	??$_Atomic_address_as@HU?$_Atomic_padded@W4LogLevel@Logger@@@std@@@std@@YAPEDHAEBU?$_Atomic_padded@W4LogLevel@Logger@@@0@@Z
+	??$_Atomic_address_as@JU?$_Atomic_padded@H@std@@@std@@YAPECJAEAU?$_Atomic_padded@H@0@@Z
+	??$_Atomic_address_as@JU?$_Atomic_padded@W4LogLevel@Logger@@@std@@@std@@YAPECJAEAU?$_Atomic_padded@W4LogLevel@Logger@@@0@@Z
+	??$_Atomic_reinterpret_as@D_N@std@@YADAEB_N@Z
+	??$_Atomic_reinterpret_as@JH@std@@YAJAEBH@Z
+	??$_Atomic_reinterpret_as@JW4LogLevel@Logger@@@std@@YAJAEBW4LogLevel@Logger@@@Z
+	??$_Construct@PEAD@?$basic_string@_WU?$char_traits@_W@std@@V?$allocator@_W@2@@std@@QEAAXPEADQEADUinput_iterator_tag@1@@Z
+	??$_Convert_Source_to_wide@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@U_Normal_conversion@filesystem@2@@filesystem@std@@YA?AV?$basic_string@_WU?$char_traits@_W@std@@V?$allocator@_W@2@@1@AEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@1@U_Normal_conversion@01@@Z
+	??$_Convert_stringoid_to_wide@U_Normal_conversion@filesystem@std@@@filesystem@std@@YA?AV?$basic_string@_WU?$char_traits@_W@std@@V?$allocator@_W@2@@1@V?$basic_string_view@DU?$char_traits@D@std@@@1@U_Normal_conversion@01@@Z
+	??$_Convert_wide_to_narrow_replace_chars@U?$char_traits@D@std@@V?$allocator@D@2@@filesystem@std@@YA?AV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@1@W4__std_code_page@@V?$basic_string_view@_WU?$char_traits@_W@std@@@1@AEBV?$allocator@D@1@@Z
+	??$_Emplace_reallocate@AEAGAEAH@?$vector@UKeyConfig@KeyboardMiddleware@@V?$allocator@UKeyConfig@KeyboardMiddleware@@@std@@@std@@QEAAPEAUKeyConfig@KeyboardMiddleware@@QEAU23@AEAGAEAH@Z
+	??$_Getvals@_W@?$time_get@DV?$istreambuf_iterator@DU?$char_traits@D@std@@@std@@@std@@IEAAX_WAEBV_Locinfo@1@@Z
+	??$_Getvals@_W@?$time_get@_WV?$istreambuf_iterator@_WU?$char_traits@_W@std@@@std@@@std@@IEAAX_WAEBV_Locinfo@1@@Z
+	??$_Immortalize_memcpy_image@V_Generic_error_category@std@@@std@@YAAEBV_Generic_error_category@0@XZ
+	??$_Immortalize_memcpy_image@V_System_error_category@std@@@std@@YAAEBV_System_error_category@0@XZ
+	??$_Insert_string@DU?$char_traits@D@std@@_K@std@@YAAEAV?$basic_ostream@DU?$char_traits@D@std@@@0@AEAV10@QEBD_K@Z
+	??$_Integral_to_string@DH@std@@YA?AV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@0@H@Z
+	??$_Invoke@V?$tuple@P8SerialMonitor@@EAAXXZPEAV1@@std@@$0A@$00@thread@std@@CAIPEAX@Z
+	??$_Maklocstr@D@std@@YAPEADPEBDPEADAEBU_Cvtvec@@@Z
+	??$_Reallocate_grow_by@V<lambda_319d5e083f45f90dcdce5dce53cbb275>@@D@?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@AEAAAEAV01@_KV<lambda_319d5e083f45f90dcdce5dce53cbb275>@@D@Z
+	??$_Reallocate_grow_by@V<lambda_65e615be2a453ca0576c979606f46740>@@PEBD_K@?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@AEAAAEAV01@_KV<lambda_65e615be2a453ca0576c979606f46740>@@PEBD_K@Z
+	??$_Reallocate_grow_by@V<lambda_9013ee9e23efe4882b67eff5b0ecf103>@@$$V@?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@AEAAAEAV01@_KV<lambda_9013ee9e23efe4882b67eff5b0ecf103>@@@Z
+	??$_Reallocate_grow_by@V<lambda_e1befb086ad3257e3f042a63030725f7>@@_KD@?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@AEAAAEAV01@_KV<lambda_e1befb086ad3257e3f042a63030725f7>@@_KD@Z
+	??$_Reallocate_grow_by@V<lambda_f3a66ab6a0570788f31503db83886f49>@@_KPEBD_K@?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@AEAAAEAV01@_KV<lambda_f3a66ab6a0570788f31503db83886f49>@@_KPEBD2@Z
+	??$_Stringoid_from_Source@DU?$char_traits@D@std@@V?$allocator@D@2@@filesystem@std@@YA?A_PAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@1@@Z
+	??$_Test_callable@P6AXH@Z@std@@YA_NAEBQ6AXH@Z@Z
+	??$_Test_callable@P6A_NXZ@std@@YA_NAEBQ6A_NXZ@Z
+	??$_To_absolute_time@_JU?$ratio@$00$0DOI@@std@@@std@@YA?A_PAEBV?$duration@_JU?$ratio@$00$0DOI@@std@@@chrono@0@@Z
+	??$_To_xtime_10_day_clamped@_JU?$ratio@$00$0DLJKMKAA@@std@@@std@@YA_NAEAUxtime@@AEBV?$duration@_JU?$ratio@$00$0DLJKMKAA@@std@@@chrono@0@@Z
+	??$_UIntegral_to_buff@DI@std@@YAPEADPEADI@Z
+	??$_UIntegral_to_buff@DK@std@@YAPEADPEADK@Z
+	??$_UIntegral_to_string@DK@std@@YA?AV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@0@K@Z
+	??$endl@DU?$char_traits@D@std@@@std@@YAAEAV?$basic_ostream@DU?$char_traits@D@std@@@0@AEAV10@@Z
+	??$make_unique@V?$tuple@P8SerialMonitor@@EAAXXZPEAV1@@std@@P8SerialMonitor@@EAAXXZPEAV3@$0A@@std@@YA?AV?$unique_ptr@V?$tuple@P8SerialMonitor@@EAAXXZPEAV1@@std@@U?$default_delete@V?$tuple@P8SerialMonitor@@EAAXXZPEAV1@@std@@@2@@0@$$QEAP8SerialMonitor@@EAAXXZ$$QEAPEAV2@@Z
+	??$setfill@D@std@@YA?AU?$_Fillobj@D@0@D@Z
+	??$sleep_for@_JU?$ratio@$00$0DOI@@std@@@this_thread@std@@YAXAEBV?$duration@_JU?$ratio@$00$0DOI@@std@@@chrono@1@@Z
+	??$sleep_until@Usteady_clock@chrono@std@@V?$duration@_JU?$ratio@$00$0DLJKMKAA@@std@@@23@@this_thread@std@@YAXAEBV?$time_point@Usteady_clock@chrono@std@@V?$duration@_JU?$ratio@$00$0DLJKMKAA@@std@@@23@@chrono@1@@Z
+	??$use_facet@V?$codecvt@DDU_Mbstatet@@@std@@@std@@YAAEBV?$codecvt@DDU_Mbstatet@@@0@AEBVlocale@0@@Z
+	??0?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QEAA@AEBV01@@Z
+	??0?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QEAA@QEBD@Z
+	??0?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QEAA@U_String_constructor_concat_tag@1@AEAV01@1@Z
+	??0?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QEAA@U_String_constructor_concat_tag@1@AEBV01@QEBD_K23@Z
+	??0?$basic_string@_WU?$char_traits@_W@std@@V?$allocator@_W@2@@std@@QEAA@AEBV01@@Z
+	??0SerialMonitor@@QEAA@AEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z
+	??0_System_error@std@@IEAA@Verror_code@1@AEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@1@@Z
+	??0_System_error@std@@QEAA@AEBV01@@Z
+	??0bad_alloc@std@@QEAA@AEBV01@@Z
+	??0bad_array_new_length@std@@QEAA@AEBV01@@Z
+	??0bad_array_new_length@std@@QEAA@XZ
+	??0bad_cast@std@@QEAA@AEBV01@@Z
+	??0bad_cast@std@@QEAA@XZ
+	??0exception@std@@QEAA@AEBV01@@Z
+	??0filesystem_error@filesystem@std@@QEAA@AEBV012@@Z
+	??0filesystem_error@filesystem@std@@QEAA@AEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@2@AEBVpath@12@1Verror_code@2@@Z
+	??0filesystem_error@filesystem@std@@QEAA@AEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@2@AEBVpath@12@Verror_code@2@@Z
+	??0runtime_error@std@@QEAA@AEBV01@@Z
+	??0system_error@std@@QEAA@AEBV01@@Z
+	??0system_error@std@@QEAA@Verror_code@1@@Z
+	??1?$_Func_class@XAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@std@@QEAA@XZ
+	??1?$_Func_class@XH@std@@QEAA@XZ
+	??1?$_Func_class@_N$$V@std@@QEAA@XZ
+	??1?$_Tidy_deallocate_guard@V?$basic_string@_WU?$char_traits@_W@std@@V?$allocator@_W@2@@std@@@std@@QEAA@XZ
+	??1?$basic_filebuf@DU?$char_traits@D@std@@@std@@UEAA@XZ
+	??1?$basic_ofstream@DU?$char_traits@D@std@@@std@@UEAA@XZ
+	??1?$basic_ostringstream@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@UEAA@XZ
+	??1?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QEAA@XZ
+	??1?$basic_string@_WU?$char_traits@_W@std@@V?$allocator@_W@2@@std@@QEAA@XZ
+	??1?$basic_stringbuf@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@UEAA@XZ
+	??1?$basic_stringstream@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@UEAA@XZ
+	??1?$function@$$A6AXAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z@std@@QEAA@XZ
+	??1?$function@$$A6AXH@Z@std@@QEAA@XZ
+	??1?$function@$$A6A_NXZ@std@@QEAA@XZ
+	??1?$lock_guard@Vmutex@std@@@std@@QEAA@XZ
+	??1?$unique_ptr@V?$tuple@P8SerialMonitor@@EAAXXZPEAV1@@std@@U?$default_delete@V?$tuple@P8SerialMonitor@@EAAXXZPEAV1@@std@@@2@@std@@QEAA@XZ
+	??1?$unique_ptr@V_Facet_base@std@@U?$default_delete@V_Facet_base@std@@@2@@std@@QEAA@XZ
+	??1SerialMonitor@@QEAA@XZ
+	??1_Sentry_base@?$basic_ostream@DU?$char_traits@D@std@@@std@@QEAA@XZ
+	??1_System_error_message@std@@QEAA@XZ
+	??1bad_array_new_length@std@@UEAA@XZ
+	??1bad_cast@std@@UEAA@XZ
+	??1error_category@std@@UEAA@XZ
+	??1exception@std@@UEAA@XZ
+	??1filesystem_error@filesystem@std@@UEAA@XZ
+	??1locale@std@@QEAA@XZ
+	??1path@filesystem@std@@QEAA@XZ
+	??1sentry@?$basic_ostream@DU?$char_traits@D@std@@@std@@QEAA@XZ
+	??1system_error@std@@UEAA@XZ
+	??1thread@std@@QEAA@XZ
+	??4?$function@$$A6AXAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z@std@@QEAAAEAV01@AEBV01@@Z
+	??4?$function@$$A6AXH@Z@std@@QEAAAEAV01@AEBV01@@Z
+	??4?$function@$$A6A_NXZ@std@@QEAAAEAV01@AEBV01@@Z
+	??_D?$basic_ofstream@DU?$char_traits@D@std@@@std@@QEAAXXZ
+	??_D?$basic_ostringstream@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QEAAXXZ
+	??_D?$basic_stringstream@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QEAAXXZ
+	?Cleanup@KeyboardMiddleware@@SAXXZ
+	?Initialize@KeyboardMiddleware@@SA_NXZ
+	?LogMessage@KeyboardMiddleware@@CAXAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z
+	?LowLevelKeyboardProc@KeyboardMiddleware@@CA_JH_K_J@Z
+	?RegisterHardwareCallbacks@KeyboardMiddleware@@SAXV?$function@$$A6AXH@Z@std@@V?$function@$$A6A_NXZ@3@@Z
+	?RegisterKey@KeyboardMiddleware@@SAXGH@Z
+	?SendResponseToApplication@KeyboardMiddleware@@CAXG@Z
+	?SetTargetCounter@KeyboardMiddleware@@SAXH@Z
+	?_Copy@?$_Func_impl_no_alloc@P6AXH@ZXH@std@@EEBAPEAV?$_Func_base@XH@2@PEAX@Z
+	?_Copy@?$_Func_impl_no_alloc@P6A_NXZ_N$$V@std@@EEBAPEAV?$_Func_base@_N$$V@2@PEAX@Z
+	?_Delete_this@?$_Func_impl_no_alloc@P6AXH@ZXH@std@@EEAAX_N@Z
+	?_Delete_this@?$_Func_impl_no_alloc@P6A_NXZ_N$$V@std@@EEAAX_N@Z
+	?_Do_call@?$_Func_impl_no_alloc@P6AXH@ZXH@std@@EEAAX$$QEAH@Z
+	?_Do_call@?$_Func_impl_no_alloc@P6A_NXZ_N$$V@std@@EEAA_NXZ
+	?_Endwrite@?$basic_filebuf@DU?$char_traits@D@std@@@std@@IEAA_NXZ
+	?_Get@?$_Func_impl_no_alloc@P6AXH@ZXH@std@@EEBAPEBXXZ
+	?_Get@?$_Func_impl_no_alloc@P6A_NXZ_N$$V@std@@EEBAPEBXXZ
+	?_Lock@?$basic_filebuf@DU?$char_traits@D@std@@@std@@UEAAXXZ
+	?_Make_ec@filesystem@std@@YA?AVerror_code@2@W4__std_win_error@@@Z
+	?_Maklocwcs@std@@YAPEA_WPEB_W@Z
+	?_Move@?$_Func_impl_no_alloc@P6AXH@ZXH@std@@EEAAPEAV?$_Func_base@XH@2@PEAX@Z
+	?_Move@?$_Func_impl_no_alloc@P6A_NXZ_N$$V@std@@EEAAPEAV?$_Func_base@_N$$V@2@PEAX@Z
+	?_Pretty_message@filesystem_error@filesystem@std@@CA?AV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@3@V?$basic_string_view@DU?$char_traits@D@std@@@3@AEBVpath@23@1@Z
+	?_Reset_back@?$basic_filebuf@DU?$char_traits@D@std@@@std@@AEAAXXZ
+	?_Target_type@?$_Func_impl_no_alloc@P6AXH@ZXH@std@@EEBAAEBVtype_info@@XZ
+	?_Target_type@?$_Func_impl_no_alloc@P6A_NXZ_N$$V@std@@EEBAAEBVtype_info@@XZ
+	?_Throw_bad_array_new_length@std@@YAXXZ
+	?_Throw_bad_cast@std@@YAXXZ
+	?_Throw_fs_error@filesystem@std@@YAXPEBDAEBVerror_code@2@AEBVpath@12@@Z
+	?_Throw_fs_error@filesystem@std@@YAXPEBDW4__std_win_error@@AEBVpath@12@2@Z
+	?_Throw_fs_error@filesystem@std@@YAXPEBDW4__std_win_error@@AEBVpath@12@@Z
+	?_Throw_system_error@std@@YAXW4errc@1@@Z
+	?_Throw_system_error_from_std_win_error@filesystem@std@@YAXW4__std_win_error@@@Z
+	?_Tidy_deallocate@?$basic_string@_WU?$char_traits@_W@std@@V?$allocator@_W@2@@std@@AEAAXXZ
+	?_Unlock@?$basic_filebuf@DU?$char_traits@D@std@@@std@@UEAAXXZ
+	?_Xlen_string@std@@YAXXZ
+	?_Xlength@?$vector@UKeyConfig@KeyboardMiddleware@@V?$allocator@UKeyConfig@KeyboardMiddleware@@@std@@@std@@CAXXZ
+	?_Xran@?$_String_val@U?$_Simple_types@D@std@@@std@@SAXXZ
+	?allocate@?$allocator@D@std@@QEAAPEAD_K@Z
+	?allocate@?$allocator@_W@std@@QEAAPEA_W_K@Z
+	?append@?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QEAAAEAV12@QEBD_K@Z
+	?append@?$basic_string@_WU?$char_traits@_W@std@@V?$allocator@_W@2@@std@@QEAAAEAV12@_K_W@Z
+	?assign@?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QEAAAEAV12@QEBD_K@Z
+	?close@?$basic_filebuf@DU?$char_traits@D@std@@@std@@QEAAPEAV12@XZ
+	?connect@SerialMonitor@@QEAA_NXZ
+	?cpp_receive_callback_wrapper@@YA_NXZ
+	?cpp_send_callback_wrapper@@YAXH@Z
+	?deallocate@?$allocator@D@std@@QEAAXQEAD_K@Z
+	?deallocate@?$allocator@UKeyConfig@KeyboardMiddleware@@@std@@QEAAXQEAUKeyConfig@KeyboardMiddleware@@_K@Z
+	?default_error_condition@_System_error_category@std@@UEBA?AVerror_condition@2@H@Z
+	?default_error_condition@error_category@std@@UEBA?AVerror_condition@2@H@Z
+	?disconnect@SerialMonitor@@QEAAXXZ
+	?equivalent@error_category@std@@UEBA_NAEBVerror_code@2@H@Z
+	?equivalent@error_category@std@@UEBA_NHAEBVerror_condition@2@@Z
+	?getCurrentTimestamp@Logger@@CA?AV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@XZ
+	?getLevelString@Logger@@CA?AV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@W4LogLevel@1@@Z
+	?imbue@?$basic_filebuf@DU?$char_traits@D@std@@@std@@MEAAXAEBVlocale@2@@Z
+	?initialize@Logger@@SA_NAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@W4LogLevel@1@@Z
+	?log@Logger@@SAXW4LogLevel@1@AEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@PEBDH@Z
+	?logMessage@SerialMonitor@@AEAAXAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@0@Z
+	?make_error_code@std@@YA?AVerror_code@1@W4errc@1@@Z
+	?message@_Generic_error_category@std@@UEBA?AV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@2@H@Z
+	?message@_System_error_category@std@@UEBA?AV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@2@H@Z
+	?monitorTask@SerialMonitor@@AEAAXXZ
+	?name@_Generic_error_category@std@@UEBAPEBDXZ
+	?name@_System_error_category@std@@UEBAPEBDXZ
+	?open@?$basic_ofstream@DU?$char_traits@D@std@@@std@@QEAAXAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@2@HH@Z
+	?overflow@?$basic_filebuf@DU?$char_traits@D@std@@@std@@MEAAHH@Z
+	?overflow@?$basic_stringbuf@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@MEAAHH@Z
+	?pbackfail@?$basic_filebuf@DU?$char_traits@D@std@@@std@@MEAAHH@Z
+	?pbackfail@?$basic_stringbuf@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@MEAAHH@Z
+	?receiveData@SerialMonitor@@QEAA?AV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@H@Z
+	?reserve@?$basic_string@_WU?$char_traits@_W@std@@V?$allocator@_W@2@@std@@QEAAX_K@Z
+	?resize@?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QEAAX_KD@Z
+	?rotateLogFileIfNeeded@Logger@@CAXXZ
+	?seekoff@?$basic_filebuf@DU?$char_traits@D@std@@@std@@MEAA?AV?$fpos@U_Mbstatet@@@2@_JHH@Z
+	?seekoff@?$basic_stringbuf@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@MEAA?AV?$fpos@U_Mbstatet@@@2@_JHH@Z
+	?seekpos@?$basic_filebuf@DU?$char_traits@D@std@@@std@@MEAA?AV?$fpos@U_Mbstatet@@@2@V32@H@Z
+	?seekpos@?$basic_stringbuf@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@MEAA?AV?$fpos@U_Mbstatet@@@2@V32@H@Z
+	?sendCommand@SerialMonitor@@QEAA_NAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z
+	?sendSimonGameLength@SerialMonitor@@QEAA_NH@Z
+	?setConsoleColor@Logger@@CAXW4LogLevel@1@@Z
+	?setLogLevel@Logger@@SAXW4LogLevel@1@@Z
+	?setbuf@?$basic_filebuf@DU?$char_traits@D@std@@@std@@MEAAPEAV?$basic_streambuf@DU?$char_traits@D@std@@@2@PEAD_J@Z
+	?shutdown@Logger@@SAXXZ
+	?startMonitoring@SerialMonitor@@QEAAXV?$function@$$A6AXAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z@std@@@Z
+	?stopMonitoring@SerialMonitor@@QEAAXXZ
+	?str@?$basic_stringbuf@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QEBA?AV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@2@XZ
+	?sync@?$basic_filebuf@DU?$char_traits@D@std@@@std@@MEAAHXZ
+	?to_string@std@@YA?AV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@1@H@Z
+	?uflow@?$basic_filebuf@DU?$char_traits@D@std@@@std@@MEAAHXZ
+	?underflow@?$basic_filebuf@DU?$char_traits@D@std@@@std@@MEAAHXZ
+	?underflow@?$basic_stringbuf@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@MEAAHXZ
+	?verifySimonGameSuccess@SerialMonitor@@QEAA_NH@Z
+	?what@exception@std@@UEBAPEBDXZ
+	?what@filesystem_error@filesystem@std@@UEBAPEBDXZ
+	?xsgetn@?$basic_filebuf@DU?$char_traits@D@std@@@std@@MEAA_JPEAD_J@Z
+	?xsputn@?$basic_filebuf@DU?$char_traits@D@std@@@std@@MEAA_JPEBD_J@Z
+	km_cleanup
+	km_create
+	km_destroy
+	km_initialize
+	km_register_callbacks
+	km_register_key
+	sm_connect
+	sm_create
+	sm_destroy
+	sm_disconnect
+	sm_is_connected
+	sm_send_command
+	sm_send_simon_game_length
+	sm_verify_simon_game_success

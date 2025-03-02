@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\alecb\hackclub-scrapyard\target\simon_game\Release\build\CMakeFiles\8e3575144ef991b4e3e6b7d632c8cd75\INSTALL_force.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{A1DD5154-B7F7-328C-AAA3-61AF9B077DBD}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

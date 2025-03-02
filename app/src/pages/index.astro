@@ -106,6 +106,7 @@ import Layout from "../layouts/Layout.astro";
 	import { open } from "@tauri-apps/plugin-shell";
 	import { load } from "@tauri-apps/plugin-store";
 	import * as OTPAuth from "otpauth";
+	import { invoke } from "@tauri-apps/api/core";
 
 	let store = await load("file-manager");
 
@@ -114,6 +115,50 @@ import Layout from "../layouts/Layout.astro";
 			window.location.href = "/setup";
 		}
 	});
+
+	// Connect to the serial port
+	async function connectSerial() {
+		try {
+			const result = await invoke("connect_serial", {
+				portName: "COM7",
+			});
+			console.log("Connected to serial port:", result);
+
+			// Add this to verify the connection is actually working
+			const isConnected = await invoke("is_connected");
+			if (!isConnected) {
+				console.error("Serial device reports not connected");
+				return false;
+			}
+			return true;
+		} catch (e) {
+			console.error("Failed to connect:", e);
+			return false;
+		}
+	}
+
+	// Send a command
+	async function sendCommand(cmd) {
+		try {
+			await invoke("send_command", { command: cmd });
+			console.log("Command sent successfully");
+		} catch (e) {
+			console.error("Failed to send command:", e);
+		}
+	}
+
+	async function verifySimon() {
+		try {
+			const result = await invoke("verify_simon_game_success", {
+				timeoutMs: 500,
+			});
+			console.log("Simon verification result:", result);
+			return result;
+		} catch (e) {
+			console.error("Failed to verify Simon:", e);
+			return false;
+		}
+	}
 
 	async function verifyOTP() {
 		const password = prompt("Enter your password");
@@ -178,11 +223,43 @@ import Layout from "../layouts/Layout.astro";
 				window: 1,
 			}) !== null
 		) {
-			return true;
+			alert("Prepared to verify Simon game");
+			await connectSerial();
+
+			await sendCommand("4");
+
+			let result = false;
+			for (let i = 0; i < 10; i++) {
+				await new Promise((resolve) => setTimeout(resolve, 500));
+				result = await verifySimon();
+				if (result) break;
+			}
+
+			// Check the result
+			if (result) {
+				return true;
+			} else {
+				alert("Simon game verification failed");
+				return false;
+			}
 		} else {
 			alert("Invalid code");
 			return false;
 		}
+	}
+
+	function initializeKeyboardMiddleware() {
+		invoke("initialize_keyboard_middleware").then((result) => {
+			console.log("Keyboard middleware initialized:", result);
+		});
+	}
+
+	initializeKeyboardMiddleware();
+
+	function registerKey(keyCode, targetCount) {
+		invoke("register_key", { keyCode, targetCount }).then((result) => {
+			console.log("Key registered:", result);
+		});
 	}
 
 	let files = [];
@@ -216,13 +293,22 @@ import Layout from "../layouts/Layout.astro";
 	}
 
 	async function navigateTo(newDir) {
-		let path_input = document.getElementById("path-input");
-		path_input.value = newDir;
-		currentWorkingDir = newDir;
-		await buildDirList(currentWorkingDir);
-		updateFileListUI();
-		await updateFullDirectoryTree();
-		highlightCurrentPath(newDir);
+		try {
+			let path_input = document.getElementById("path-input");
+			path_input.value = newDir;
+			currentWorkingDir = newDir;
+
+			console.log(`Attempting to read directory: ${newDir}`);
+			await buildDirList(currentWorkingDir);
+
+			updateFileListUI();
+			await updateFullDirectoryTree();
+			highlightCurrentPath(newDir);
+		} catch (error) {
+			console.error("Navigation failed with error:", error);
+			document.getElementById("error-message").textContent =
+				`Failed to navigate: ${error.message || error}`;
+		}
 	}
 
 	function updateFileListUI() {
@@ -905,65 +991,67 @@ import Layout from "../layouts/Layout.astro";
 	}
 
 	// Secret kill switch in case you lock yourself out of the app because of the OTP
-    // hold ctrl + e for 5 seconds to reset the app
-    let killSwitchActive = false;
-    let killSwitchTimer = null;
-    let killSwitchStartTime = 0;
-    const killSwitchDuration = 5000; // 5 seconds
-    
-    // Create a visual indicator element
-    const killSwitchIndicator = document.createElement('div');
-    killSwitchIndicator.style.position = 'fixed';
-    killSwitchIndicator.style.bottom = '10px';
-    killSwitchIndicator.style.right = '10px';
-    killSwitchIndicator.style.padding = '5px 10px';
-    killSwitchIndicator.style.background = 'rgba(255, 0, 0, 0.7)';
-    killSwitchIndicator.style.color = 'white';
-    killSwitchIndicator.style.borderRadius = '5px';
-    killSwitchIndicator.style.zIndex = '10000';
-    killSwitchIndicator.style.display = 'none';
-    document.body.appendChild(killSwitchIndicator);
-    
-    document.addEventListener("keydown", (e) => {
-        if (e.key === "e" && e.ctrlKey && !killSwitchActive) {
-            killSwitchActive = true;
-            killSwitchStartTime = Date.now();
-            killSwitchIndicator.style.display = 'block';
-            
-            // Update progress indicator
-            killSwitchTimer = setInterval(() => {
-                const elapsed = Date.now() - killSwitchStartTime;
-                const remaining = Math.max(0, killSwitchDuration - elapsed);
-                const percent = Math.floor((elapsed / killSwitchDuration) * 100);
-                
-                killSwitchIndicator.textContent = `Resetting app: ${percent}%`;
-                
-                if (elapsed >= killSwitchDuration) {
-                    clearInterval(killSwitchTimer);
-                    killSwitchIndicator.style.display = 'none';
-                    
-                    const confirmed = confirm(
-                        "Are you sure you want to reset the app?"
-                    );
-                    if (confirmed) {
-                        store.clear();
-                        window.location.href = "/";
-                    }
-                    killSwitchActive = false;
-                }
-            }, 100);
-        }
-    });
-    
-    document.addEventListener("keyup", (e) => {
-        if (e.key === "e" || !e.ctrlKey) {
-            if (killSwitchActive) {
-                clearInterval(killSwitchTimer);
-                killSwitchIndicator.style.display = 'none';
-                killSwitchActive = false;
-            }
-        }
-    });
+	// hold ctrl + e for 5 seconds to reset the app
+	let killSwitchActive = false;
+	let killSwitchTimer = null;
+	let killSwitchStartTime = 0;
+	const killSwitchDuration = 5000; // 5 seconds
+
+	// Create a visual indicator element
+	const killSwitchIndicator = document.createElement("div");
+	killSwitchIndicator.style.position = "fixed";
+	killSwitchIndicator.style.bottom = "10px";
+	killSwitchIndicator.style.right = "10px";
+	killSwitchIndicator.style.padding = "5px 10px";
+	killSwitchIndicator.style.background = "rgba(255, 0, 0, 0.7)";
+	killSwitchIndicator.style.color = "white";
+	killSwitchIndicator.style.borderRadius = "5px";
+	killSwitchIndicator.style.zIndex = "10000";
+	killSwitchIndicator.style.display = "none";
+	document.body.appendChild(killSwitchIndicator);
+
+	document.addEventListener("keydown", (e) => {
+		if (e.key === "e" && e.ctrlKey && !killSwitchActive) {
+			killSwitchActive = true;
+			killSwitchStartTime = Date.now();
+			killSwitchIndicator.style.display = "block";
+
+			// Update progress indicator
+			killSwitchTimer = setInterval(() => {
+				const elapsed = Date.now() - killSwitchStartTime;
+				const remaining = Math.max(0, killSwitchDuration - elapsed);
+				const percent = Math.floor(
+					(elapsed / killSwitchDuration) * 100,
+				);
+
+				killSwitchIndicator.textContent = `Resetting app: ${percent}%`;
+
+				if (elapsed >= killSwitchDuration) {
+					clearInterval(killSwitchTimer);
+					killSwitchIndicator.style.display = "none";
+
+					const confirmed = confirm(
+						"Are you sure you want to reset the app?",
+					);
+					if (confirmed) {
+						store.clear();
+						window.location.href = "/";
+					}
+					killSwitchActive = false;
+				}
+			}, 100);
+		}
+	});
+
+	document.addEventListener("keyup", (e) => {
+		if (e.key === "e" || !e.ctrlKey) {
+			if (killSwitchActive) {
+				clearInterval(killSwitchTimer);
+				killSwitchIndicator.style.display = "none";
+				killSwitchActive = false;
+			}
+		}
+	});
 </script>
 
 <style is:global>

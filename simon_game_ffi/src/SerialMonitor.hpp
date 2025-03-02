@@ -17,7 +17,7 @@ private:
     std::function<void(const std::string&)> dataCallback;
 
 public:
-    SerialMonitor(const std::string& port = "COM6");
+    SerialMonitor(const std::string& port = "COM7");
     ~SerialMonitor();
     
     bool connect();

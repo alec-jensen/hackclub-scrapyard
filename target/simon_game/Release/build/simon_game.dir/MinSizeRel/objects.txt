@@ -1,0 +1,4 @@
+C:/Users/alecb/hackclub-scrapyard/target/simon_game/Release/build/simon_game.dir/MinSizeRel/SerialMonitor.obj
+C:/Users/alecb/hackclub-scrapyard/target/simon_game/Release/build/simon_game.dir/MinSizeRel/Logger.obj
+C:/Users/alecb/hackclub-scrapyard/target/simon_game/Release/build/simon_game.dir/MinSizeRel/middleWhere.obj
+C:/Users/alecb/hackclub-scrapyard/target/simon_game/Release/build/simon_game.dir/MinSizeRel/ffi.obj

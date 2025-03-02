@@ -1,13 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <CustomBuild Include="C:\Users\brent\Documents\Programming Projects\HackClub\simon_game_ffi\build\CMakeFiles\cfe8527d6695a55b2e61330d3876efbe\INSTALL_force.rule">
+    <CustomBuild Include="C:\Users\alecb\hackclub-scrapyard\simon_game_ffi\build\CMakeFiles\117f72df9909df9aa4a2a231eba5832f\INSTALL_force.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="CMake Rules">
-      <UniqueIdentifier>{F7001684-D2D3-384A-BB82-0E378A934346}</UniqueIdentifier>
+      <UniqueIdentifier>{A4A6AC7B-05DD-31D6-9D23-3872927A8D35}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
