@@ -1,0 +1,149 @@
+---
+
+---
+
+<h1>3-Factor Authentication File Manager Demo</h1>
+<h2>Demo information:</h2>
+<em>This is a demo page intended to showcase the 3-factor authentication system. The
+    password and TOTP code are hardcoded for demonstration purposes. In a real-world
+    scenario, the password and TOTP code would be generated and managed securely.</em>
+
+<p>Password: 4s>^a(7KTk.0</p>
+<p>
+    Current TOTP code: <span id="totp"></span> (<span id="remaining"></span> seconds
+    remaining)
+</p>
+<p>Simon game instructions:</p>
+<ol>
+    <li>Watch the sequence of colors</li>
+    <li>
+        Repeat the sequence by clicking on the buttons in front of each color
+    </li>
+    <li>If you get the sequence right, you will be authenticated</li>
+</ol>
+
+<h2>Tech Stack Overview</h2>
+<p>
+    Our application is built with Astro.js and Tauri, combining modern web development
+    with native desktop functionality. The frontend communicates with a high-performance
+    C++ library that handles system-level operations via the Windows API. Under the hood,
+    MicroPython runs on an Orpheus Pico board and interfaces with the C++ library through
+    serial communication. Tauri's robust Foreign Function Interface (FFI) seamlessly bridges
+    these components, enabling efficient control and interaction between the user interface
+    and hardware.
+</p>
+
+<script>
+    import { load } from "@tauri-apps/plugin-store";
+    import * as OTPAuth from "otpauth";
+
+    let store = await load("file-manager");
+
+    const password = "4s>^a(7KTk.0";
+
+    const encryptedData = await store.get("encryptedSecret");
+    if (!encryptedData) {
+        alert("No encrypted secret found");
+    }
+
+    const { ciphertext, salt, iv } = encryptedData;
+
+    const ciphertextArray = new Uint8Array(ciphertext);
+    const saltArray = new Uint8Array(salt);
+    const ivArray = new Uint8Array(iv);
+
+    // Recreate the key material from the password
+    const keyMaterial = await window.crypto.subtle.importKey(
+        "raw",
+        new TextEncoder().encode(password),
+        "PBKDF2",
+        false,
+        ["deriveBits", "deriveKey"],
+    );
+
+    // Derive the same encryption key using the stored salt
+    const decryptionKey = await window.crypto.subtle.deriveKey(
+        {
+            name: "PBKDF2",
+            salt: saltArray,
+            iterations: 100000,
+            hash: "SHA-256",
+        },
+        keyMaterial,
+        { name: "AES-GCM", length: 256 },
+        false,
+        ["encrypt", "decrypt"],
+    );
+
+    // Decrypt the data
+    const decryptedData = await window.crypto.subtle.decrypt(
+        {
+            name: "AES-GCM",
+            iv: ivArray,
+        },
+        decryptionKey,
+        ciphertextArray,
+    );
+
+    // Convert the decrypted data to a string
+    const secretKey = new TextDecoder().decode(decryptedData);
+
+    // Create a new TOTP object
+    const totp = new OTPAuth.TOTP({
+        algorithm: "SHA-1",
+        digits: 6,
+        period: 30,
+        secret: secretKey,
+    });
+
+    setInterval(() => {
+        const remaining = 30 - ((Date.now() / 1000) % 30);
+        document.getElementById("totp").innerText = totp.generate();
+        document.getElementById("remaining").innerText =
+            remaining.toFixed(0);
+    }, 1000);
+</script>
+
+<style>
+    body {
+      background-color: #f0f0f0;
+      font-family: Arial, sans-serif;
+      padding: 2rem;
+      line-height: 1.6;
+      color: #333;
+    }
+  
+    h1 {
+      color: #3a86ff;
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+  
+    h2 {
+      color: #8338ec;
+      margin-top: 2rem;
+    }
+  
+    p {
+      margin: 1rem 0;
+    }
+    
+    em {
+      color: #555;
+      font-style: italic;
+    }
+  
+    ol {
+      margin: 1rem 0 2rem 2rem;
+    }
+    
+    li {
+      margin: 0.5rem 0;
+    }
+  
+    /* Highlight TOTP code and remaining timer */
+    #totp, #remaining {
+      font-weight: bold;
+      color: #e63946;
+    }
+  </style>

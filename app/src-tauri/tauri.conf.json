@@ -12,8 +12,16 @@
     "windows": [
       {
         "title": "File Explorer",
+        "label": "main",
         "width": 800,
         "height": 600
+      },
+      {
+        "title": "Demo Information",
+        "label": "demo",
+        "width": 800,
+        "height": 600,
+        "url": "/demo"
       }
     ],
     "security": {

@@ -3,7 +3,8 @@
     "identifier": "default",
     "description": "Default capabilities for the main window",
     "windows": [
-        "main"
+        "main",
+        "demo"
     ],
     "permissions": [
         "fs:default",
