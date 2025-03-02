@@ -28,6 +28,33 @@
         "core:path:allow-resolve-directory",
         "core:path:allow-basename",
         "core:path:allow-dirname",
-        "core:path:allow-join"
+        "core:path:allow-join",
+        "shell:allow-open",
+        "store:allow-clear",
+        "store:allow-delete",
+        "store:allow-entries",
+        "store:allow-get",
+        "store:allow-get-store",
+        "store:allow-has",
+        "store:allow-keys",
+        "store:allow-length",
+        "store:allow-load",
+        "store:allow-reload",
+        "store:allow-reset",
+        "store:allow-save",
+        "store:allow-set",
+        "store:allow-values",
+        "http:allow-fetch",
+        {
+            "identifier": "http:default",
+            "allow": [
+                {
+                    "url": "https://**"
+                },
+                {
+                    "url": "http://**"
+                }
+            ]
+        }
     ]
 }

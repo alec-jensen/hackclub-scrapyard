@@ -1,0 +1,207 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="Setup">
+    <div id="step-1">
+        <h1>Step 1</h1>
+        <p>Click the button below to start the setup process</p>
+        <button id="start-setup">Start Setup</button>
+    </div>
+    <div id="step-2">
+        <h1>Step 2</h1>
+        <p>Enter a secure password to encrypt your TOTP secret</p>
+        <input type="password" id="password" placeholder="Password" />
+        <input
+            type="password"
+            id="confirm-password"
+            placeholder="Confirm Password"
+        />
+        <button id="encrypt-secret">Check Password</button>
+    </div>
+    <div id="step-3">
+        <h1>Step 3</h1>
+        <p>Scan the following QR code with your authenticator app</p>
+        <canvas id="qr-code"></canvas>
+        <p>Enter the 6-digit code from your authenticator app</p>
+        <input type="text" id="code" placeholder="Code" />
+        <button id="verify-code">Verify Code</button>
+    </div>
+</Layout>
+
+<script>
+    import { load } from "@tauri-apps/plugin-store";
+    import { fetch } from "@tauri-apps/plugin-http";
+    import QRCode from "qrcode";
+    import * as OTPAuth from "otpauth";
+
+    let store = await load("file-manager");
+
+    let password;
+    let totp;
+
+    document
+        .getElementById("start-setup")
+        ?.addEventListener("click", async () => {
+            document.getElementById("step-1").style.display = "none";
+            document.getElementById("step-2").style.display = "flex";
+        });
+
+    document
+        .getElementById("encrypt-secret")
+        ?.addEventListener("click", async () => {
+            let password = document.getElementById("password").value;
+            let confirmPassword =
+                document.getElementById("confirm-password").value;
+
+            if (password !== confirmPassword) {
+                alert("Passwords do not match");
+                return;
+            }
+
+            if (password.length < 8) {
+                alert("Password must be at least 8 characters long");
+                return;
+            }
+
+            const hashBuffer = await crypto.subtle.digest(
+                "SHA-1",
+                new TextEncoder().encode(password),
+            );
+
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const hashHex = hashArray
+                .map((b) => b.toString(16).padStart(2, "0"))
+                .join("");
+
+            const prefix = hashHex.substring(0, 5).toUpperCase();
+            const suffix = hashHex.substring(5).toUpperCase();
+
+            try {
+                const response = await fetch(
+                    `https://api.pwnedpasswords.com/range/${prefix}`,
+                );
+
+                const data = await response.text();
+                const hashes = data.split("\r\n");
+
+                let found = false;
+                for (const line of hashes) {
+                    const [hash, count] = line.split(":");
+                    if (hash === suffix) {
+                        alert(
+                            `Password found in ${count} data breaches. Please choose a more secure password.`,
+                        );
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (!found) {
+                    document.getElementById("step-2").style.display = "none";
+                    document.getElementById("step-3").style.display = "flex";
+
+                    let secret = new OTPAuth.Secret({ size: 128 });
+
+                    totp = new OTPAuth.TOTP({
+                        issuer: "File Manager",
+                        label: "user",
+                        algorithm: "SHA1",
+                        digits: 6,
+                        period: 30,
+                        secret: secret.base32,
+                    });
+
+                    QRCode.toCanvas(
+                        document.getElementById("qr-code"),
+                        totp.toString(),
+                        { errorCorrectionLevel: "H" },
+                    );
+
+                    const salt = window.crypto.getRandomValues(new Uint8Array(16));
+
+                    const keyMaterial = await window.crypto.subtle.importKey(
+                        "raw",
+                        new TextEncoder().encode(password),
+                        "PBKDF2",
+                        false,
+                        ["deriveBits", "deriveKey"],
+                    );
+
+                    const encryptionKey = await window.crypto.subtle.deriveKey(
+                        {
+                            name: "PBKDF2",
+                            salt,
+                            iterations: 100000,
+                            hash: "SHA-256",
+                        },
+                        keyMaterial,
+                        { name: "AES-GCM", length: 256 },
+                        false,
+                        ["encrypt", "decrypt"],
+                    );
+
+                    const iv = window.crypto.getRandomValues(new Uint8Array(12));
+                    const encryptedData = await window.crypto.subtle.encrypt(
+                        {
+                            name: "AES-GCM",
+                            iv,
+                        },
+                        encryptionKey,
+                        new TextEncoder().encode(totp.secret.base32),
+                    );
+
+                    await store.set("encryptedSecret", {
+                        ciphertext: Array.from(new Uint8Array(encryptedData)),
+                        salt: Array.from(salt),
+                        iv: Array.from(iv),
+                    });
+
+                    await store.save();
+                }
+            } catch (error) {
+                console.error("Error checking password:", error);
+                alert("Could not check password security. Continuing anyway.");
+
+                document.getElementById("step-2").style.display = "none";
+                document.getElementById("step-3").style.display = "flex";
+            }
+        });
+
+    document
+        .getElementById("verify-code")
+        ?.addEventListener("click", async () => {
+            let code = document.getElementById("code").value;
+
+            console.log(`Code entered: ${code}`);
+            console.log(totp);
+            console.log(`Current time: ${Date.now()}`);
+            console.log(`Current counter: ${totp.counter}`);
+
+            let valid = totp.validate({token: code, window: 1});
+
+            console.log(valid);
+
+            if (valid !== null) {
+                await store.set("setupComplete", true);
+                await store.save();
+                window.location.href = "/";
+            } else {
+                alert("Code is invalid");
+            }
+        });
+</script>
+
+<style>
+    div {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    #step-2,
+    #step-3 {
+        display: none;
+    }
+</style>

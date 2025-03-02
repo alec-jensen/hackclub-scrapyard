@@ -4,27 +4,173 @@ import Layout from "../layouts/Layout.astro";
 
 <Layout>
 	<main style="position: relative;">
+		<div id="actions">
+			<div class="toolbar">
+				<button id="new-file-btn" title="New File">
+					<span class="icon">📝</span>
+					<p>New File</p>
+				</button>
+				<button id="new-folder-btn" title="New Folder">
+					<span class="icon">🗂️</span>
+					<p>New Folder</p>
+				</button>
+				<button id="delete-btn" title="Delete">
+					<span class="icon">❌</span>
+					<p>Delete</p>
+				</button>
+				<button id="rename-btn" title="Rename">
+					<span class="icon">🔤</span>
+					<p>Rename</p>
+				</button>
+				<button id="copy-btn" title="Copy">
+					<span class="icon">📑</span>
+					<p>Copy</p>
+				</button>
+				<button id="paste-btn" title="Paste">
+					<span class="icon">📥</span>
+					<p>Paste</p>
+				</button>
+				<button id="refresh-btn" title="Refresh">
+					<span class="icon">🔄</span>
+					<p>Refresh</p>
+				</button>
+				<button id="settings-btn" title="Settings">
+					<span class="icon">⚙️</span>
+					<p>Settings</p>
+				</button>
+			</div>
+
+			<div id="path">
+				<input type="text" id="path-input" />
+				<button id="go-btn">Go</button>
+			</div>
+		</div>
+		<!-- Added status and error message containers -->
+		<div id="status-message" style="margin-bottom: 10px;"></div>
+		<div id="error-message" style="color: red;"></div>
 		<ul id="file-list"></ul>
-		<!-- New selection box element -->
-		<div id="selection-box" style="display: none; position: absolute;"></div>
+		<div id="selection-box" style="display: none; position: absolute;">
+		</div>
+		<div
+			id="context-menu"
+			style="display: none; position: absolute; z-index: 2000;"
+		>
+			<ul>
+				<li id="cm-new-file">New File</li>
+				<li id="cm-new-folder">New Folder</li>
+				<li id="cm-delete">Delete</li>
+				<li id="cm-copy">Copy</li>
+				<li id="cm-paste">Paste</li>
+				<li id="cm-rename">Rename</li>
+				<li id="cm-refresh">Refresh</li>
+			</ul>
+		</div>
 	</main>
 </Layout>
 
 <script>
-	import { readDir, BaseDirectory } from "@tauri-apps/plugin-fs";
+	import {
+		readDir,
+		mkdir,
+		create,
+		remove,
+		copyFile,
+		BaseDirectory,
+		rename,
+	} from "@tauri-apps/plugin-fs";
 	import * as path from "@tauri-apps/api/path";
+	import { open } from "@tauri-apps/plugin-shell";
+	import { load } from "@tauri-apps/plugin-store";
+	import * as OTPAuth from "otpauth";
+
+	try {
+		let store = await load("file-manager");
+
+		store.get("setupComplete").then((setupComplete) => {
+			if (!setupComplete) {
+				window.location.href = "/setup";
+			}
+		});
+	} catch (error) {
+		console.error("Error loading store:", error);
+	}
+
+	async function verifyOTP() {
+		const password = prompt("Enter your password");
+		if (!password) return;
+		const code = prompt(
+			"Enter the 6-digit code from your authenticator app",
+		);
+		if (!code) return;
+
+		const encryptedData = store.get("encryptedSecret");
+		if (!encryptedData) {
+			alert("No encrypted secret found");
+			return;
+		}
+
+		const { ciphertext, salt, iv } = encryptedData;
+
+		const ciphertextArray = new Uint8Array(ciphertext);
+		const saltArray = new Uint8Array(salt);
+		const ivArray = new Uint8Array(iv);
+
+		// Recreate the key material from the password
+		const keyMaterial = await window.crypto.subtle.importKey(
+			"raw",
+			new TextEncoder().encode(password),
+			"PBKDF2",
+			false,
+			["deriveBits", "deriveKey"],
+		);
+
+		// Derive the same encryption key using the stored salt
+		const decryptionKey = await window.crypto.subtle.deriveKey(
+			{
+				name: "PBKDF2",
+				salt: saltArray,
+				iterations: 100000,
+				hash: "SHA-256",
+			},
+			keyMaterial,
+			{ name: "AES-GCM", length: 256 },
+			false,
+			["encrypt", "decrypt"],
+		);
+
+		// Decrypt the data
+		const decryptedData = await window.crypto.subtle.decrypt(
+			{
+				name: "AES-GCM",
+				iv: ivArray,
+			},
+			decryptionKey,
+			ciphertextArray,
+		);
+
+		// Convert the decrypted data to a string
+		const secretKey = new TextDecoder().decode(decryptedData);
+
+		if (
+			OTPAuth.TOTP.validate({
+				secret: OTPAuth.Secret.fromBase32(secretKey),
+				token: code,
+				window: 1,
+			})
+		) {
+			return true;
+		} else {
+			alert("Invalid code");
+			return false;
+		}
+	}
 
 	let files = [];
-	
-	let initialDir;
-	let currentWorkingDir;
+	let initialDir, currentWorkingDir;
+	let isDragging = false,
+		lastClickedIndex = null;
+	let copiedFiles = [];
 
-	// Global variables for drag multiselect
-	let isDragging = false;
-	let dragInitialState = false;
-	let lastClickedIndex = null; // new
-	
-	// End drag on mouseup globally
 	document.addEventListener("mouseup", () => {
 		isDragging = false;
 	});
@@ -33,35 +179,28 @@ import Layout from "../layouts/Layout.astro";
 		let entries = [];
 		try {
 			entries = await readDir(dir, { baseDir: BaseDirectory.Home });
+			document.getElementById("error-message").textContent = "";
 		} catch (error) {
 			console.error(error);
-			alert(`Error reading directory: ${error}`);
-			entries = [];
+			document.getElementById("error-message").textContent =
+				"Error reading directory: " + error.message;
 		}
-
-		files = [];
-
-		entries.forEach((entry) => {
-			files.push({
-				name: entry.name,
-				isDirectory: entry.isDirectory,
-				isFile: entry.isFile,
-				isSymlink: entry.isSymlink,
-			});
-		});
-
+		files = entries.map((entry) => ({
+			name: entry.name,
+			isDirectory: entry.isDirectory,
+			isFile: entry.isFile,
+			isSymlink: entry.isSymlink,
+		}));
 		files.sort((a, b) => {
-			if (a.isDirectory && !b.isDirectory) {
-				return -1;
-			} else if (!a.isDirectory && b.isDirectory) {
-				return 1;
-			} else {
-				return a.name.localeCompare(b.name);
-			}
+			if (a.isDirectory && !b.isDirectory) return -1;
+			if (!a.isDirectory && b.isDirectory) return 1;
+			return a.name.localeCompare(b.name);
 		});
 	}
 
 	async function navigateTo(newDir) {
+		let path_input = document.getElementById("path-input");
+		path_input.value = newDir;
 		currentWorkingDir = newDir;
 		await buildDirList(currentWorkingDir);
 		updateFileListUI();
@@ -69,49 +208,39 @@ import Layout from "../layouts/Layout.astro";
 
 	function updateFileListUI() {
 		const fileList = document.getElementById("file-list");
-		// Clear the list
+		if (!fileList) return;
 		fileList.innerHTML = "";
-
-		// Up directory item as a full-width, double-clickable <li>
 		const upItem = document.createElement("li");
 		upItem.textContent = "..";
 		upItem.style.cursor = "pointer";
 		upItem.addEventListener("dblclick", async (e) => {
 			e.preventDefault();
+			if (!verifyOTP()) return;
 			const parentDir = await path.dirname(currentWorkingDir);
 			navigateTo(parentDir);
 		});
 		fileList.appendChild(upItem);
-
 		files.forEach((file, index) => {
 			const fileEntry = document.createElement("li");
 			fileEntry.style.width = "100%";
-			fileEntry.dataset.fileIndex = index;  // assign index
-
-			// Add checkbox for selection
+			fileEntry.dataset.fileIndex = index;
 			const checkbox = document.createElement("input");
 			checkbox.type = "checkbox";
 			checkbox.className = "file-checkbox";
 			checkbox.style.marginRight = "8px";
 			checkbox.addEventListener("change", () => {
 				fileEntry.classList.toggle("selected", checkbox.checked);
+				updateActionButtons();
 			});
-			fileEntry.appendChild(checkbox);
+			fileEntry.prepend(checkbox);
 
-			 // Remove or comment out the old drag multi-select code attached to fileEntry
-			// fileEntry.addEventListener("mousedown", ...)
-			// fileEntry.addEventListener("mouseenter", ...)
-
-			// New click event behavior for selecting
 			fileEntry.addEventListener("click", (e) => {
 				if (e.target.matches("input.file-checkbox")) return;
 				if (e.ctrlKey) {
-					// Toggle clicked entry without clearing others
 					const isSelected = fileEntry.classList.toggle("selected");
 					checkbox.checked = isSelected;
 					lastClickedIndex = index;
 				} else if (e.shiftKey) {
-					// Range selection
 					if (lastClickedIndex === null) {
 						lastClickedIndex = index;
 						fileEntry.classList.add("selected");
@@ -119,77 +248,134 @@ import Layout from "../layouts/Layout.astro";
 					} else {
 						let start = Math.min(lastClickedIndex, index);
 						let end = Math.max(lastClickedIndex, index);
-						document.querySelectorAll("#file-list li[data-file-index]").forEach(li => {
-							const liIndex = parseInt(li.dataset.fileIndex);
-							const box = li.querySelector("input.file-checkbox");
-							if (liIndex >= start && liIndex <= end) {
-								li.classList.add("selected");
-								if (box) box.checked = true;
-							}
-						});
+						document
+							.querySelectorAll("#file-list li[data-file-index]")
+							.forEach((li) => {
+								const liIndex = parseInt(li.dataset.fileIndex);
+								const box = li.querySelector(
+									"input.file-checkbox",
+								);
+								if (liIndex >= start && liIndex <= end) {
+									li.classList.add("selected");
+									if (box) box.checked = true;
+								}
+							});
 					}
 				} else {
-					// Single click clears other selections and selects only this entry
-					document.querySelectorAll("#file-list li.selected").forEach(li => {
-						li.classList.remove("selected");
-						const box = li.querySelector("input.file-checkbox");
-						if (box) box.checked = false;
-					});
-					fileEntry.classList.add("selected");
-					checkbox.checked = true;
-					lastClickedIndex = index;
+					if (fileEntry.classList.contains("selected")) {
+						fileEntry.classList.remove("selected");
+						checkbox.checked = false;
+						lastClickedIndex = null;
+					} else {
+						fileEntry.classList.add("selected");
+						checkbox.checked = true;
+						lastClickedIndex = index;
+					}
 				}
+				updateActionButtons();
+			});
+
+			fileEntry.addEventListener("contextmenu", (e) => {
+				e.stopPropagation();
+				showContextMenu(e);
 			});
 
 			if (file.isDirectory) {
-				// Create icon and name spans
 				const iconSpan = document.createElement("span");
 				iconSpan.className = "icon";
 				iconSpan.textContent = "📁";
 				fileEntry.appendChild(iconSpan);
-
 				const nameSpan = document.createElement("span");
 				nameSpan.className = "name";
 				nameSpan.textContent = " " + file.name;
 				fileEntry.appendChild(nameSpan);
-
 				fileEntry.style.cursor = "pointer";
 				fileEntry.addEventListener("dblclick", (e) => {
 					e.preventDefault();
-					path.join(currentWorkingDir, file.name).then(newPath => {
-						navigateTo(newPath);
-					});
+					if (!verifyOTP()) return;
+					path.join(currentWorkingDir, file.name).then((newPath) =>
+						navigateTo(newPath),
+					);
 				});
 			} else {
-					// For files and symlinks
 				const iconSpan = document.createElement("span");
 				iconSpan.className = "icon";
-				iconSpan.textContent = file.isFile ? "📄" : file.isSymlink ? "🔗" : "";
+				iconSpan.textContent = file.isFile
+					? "📄"
+					: file.isSymlink
+						? "🔗"
+						: "";
 				fileEntry.appendChild(iconSpan);
-
 				const nameSpan = document.createElement("span");
 				nameSpan.className = "name";
 				nameSpan.textContent = " " + file.name;
 				fileEntry.appendChild(nameSpan);
+
+				if (file.isFile) {
+					fileEntry.style.cursor = "pointer";
+					fileEntry.addEventListener("dblclick", async (e) => {
+						e.preventDefault();
+						if (!verifyOTP()) return;
+						try {
+							const filePath = await path.join(
+								currentWorkingDir,
+								file.name,
+							);
+							await open(filePath);
+							document.getElementById(
+								"status-message",
+							).textContent = `Opening: ${file.name}`;
+							setTimeout(
+								() =>
+									(document.getElementById(
+										"status-message",
+									).textContent = ""),
+								3000,
+							);
+						} catch (error) {
+							console.error("Failed to open file:", error);
+							document.getElementById(
+								"error-message",
+							).textContent =
+								`Error opening file: ${error.message}`;
+						}
+					});
+				}
 			}
 			fileList.appendChild(fileEntry);
 		});
 	}
 
-	// Initialize the navigation by setting the initial directory and loading it.
+	document.getElementById("go-btn").addEventListener("click", async () => {
+		const newPath = document.getElementById("path-input").value;
+		await navigateTo(newPath);
+	});
+
+	document
+		.getElementById("path-input")
+		.addEventListener("keydown", async (e) => {
+			if (e.key === "Enter") {
+				const newPath = document.getElementById("path-input").value;
+				await navigateTo(newPath);
+			}
+		});
+
 	(async () => {
 		initialDir = await path.homeDir();
 		currentWorkingDir = initialDir;
-		await buildDirList(currentWorkingDir);
-		updateFileListUI();
+		await navigateTo(initialDir);
+		updateActionButtons();
 	})();
 
 	let selectionBox = document.getElementById("selection-box");
-	let startX, startY, isSelecting = false;
-
-	// Listen for mousedown on the main element (avoid checkbox clicks)
+	let startX,
+		startY,
+		isSelecting = false;
 	document.querySelector("main").addEventListener("mousedown", (e) => {
-		if(e.target.closest("input.file-checkbox")) return;
+		// Skip selection if clicking on toolbar or context menu
+		if (e.target.closest("#actions") || e.target.closest("#context-menu"))
+			return;
+		if (e.button === 2 || e.target.closest("input.file-checkbox")) return;
 		e.stopPropagation();
 		e.preventDefault();
 		isSelecting = true;
@@ -204,37 +390,41 @@ import Layout from "../layouts/Layout.astro";
 
 	document.addEventListener("mousemove", (e) => {
 		if (!isSelecting) return;
-		const currentX = e.pageX;
-		const currentY = e.pageY;
+		const currentX = e.pageX,
+			currentY = e.pageY;
 		const rectX = Math.min(startX, currentX);
 		const rectY = Math.min(startY, currentY);
-		const rectWidth = Math.abs(startX - currentX);
-		const rectHeight = Math.abs(startY - currentY);
-
 		selectionBox.style.left = rectX + "px";
 		selectionBox.style.top = rectY + "px";
-		selectionBox.style.width = rectWidth + "px";
-		selectionBox.style.height = rectHeight + "px";
-
-		// New: mark entries intersecting with the selection box
+		selectionBox.style.width = Math.abs(startX - currentX) + "px";
+		selectionBox.style.height = Math.abs(startY - currentY) + "px";
 		const selRect = selectionBox.getBoundingClientRect();
-		document.querySelectorAll("#file-list li").forEach(li => {
+		document.querySelectorAll("#file-list li").forEach((li) => {
 			const liRect = li.getBoundingClientRect();
-			if (rectsIntersect(liRect, selRect)) {
-				li.classList.add("selecting");
-			} else {
-				li.classList.remove("selecting");
-			}
+			li.classList.toggle(
+				"selecting",
+				!(
+					liRect.left > selRect.right ||
+					liRect.right < selRect.left ||
+					liRect.top > selRect.bottom ||
+					liRect.bottom < selRect.top
+				),
+			);
 		});
 	});
 
 	document.addEventListener("mouseup", (e) => {
+		isDragging = false;
+
 		if (!isSelecting) return;
 		isSelecting = false;
 		selectionBox.style.display = "none";
 
-		const fileEntries = document.querySelectorAll("#file-list li");
-		fileEntries.forEach(li => {
+		// Only modify selections if we were actually doing box selection
+		const wasBoxSelecting =
+			document.querySelectorAll("#file-list li.selecting").length > 0;
+
+		document.querySelectorAll("#file-list li").forEach((li) => {
 			if (li.classList.contains("selecting")) {
 				const checkbox = li.querySelector("input.file-checkbox");
 				if (checkbox) {
@@ -242,36 +432,244 @@ import Layout from "../layouts/Layout.astro";
 					li.classList.add("selected");
 				}
 				li.classList.remove("selecting");
+			} else if (wasBoxSelecting) {
+				// Only clear non-selected items if we were actually box selecting
+				const checkbox = li.querySelector("input.file-checkbox");
+				if (checkbox) checkbox.checked = false;
+				li.classList.remove("selected");
 			}
 		});
+		updateActionButtons();
 	});
 
-	function rectsIntersect(r1, r2) {
-		return !(r2.left > r1.right ||
-			r2.right < r1.left ||
-			r2.top > r1.bottom ||
-			r2.bottom < r1.top);
+	function updateActionButtons() {
+		const renameBtn = document.getElementById("rename-btn");
+		const selectedCount = document.querySelectorAll(
+			"#file-list li.selected",
+		).length;
+		renameBtn.disabled = selectedCount !== 1;
+		renameBtn.style.opacity = selectedCount === 1 ? 1 : 0.5;
+
+		const deleteBtn = document.getElementById("delete-btn");
+		deleteBtn.disabled = selectedCount === 0;
+		deleteBtn.style.opacity = selectedCount > 0 ? 1 : 0.5;
+
+		const copyBtn = document.getElementById("copy-btn");
+		copyBtn.disabled = selectedCount === 0;
+		copyBtn.style.opacity = selectedCount > 0 ? 1 : 0.5;
+
+		const pasteBtn = document.getElementById("paste-btn");
+		pasteBtn.disabled = copiedFiles.length === 0;
+		pasteBtn.style.opacity = copiedFiles.length > 0 ? 1 : 0.5;
 	}
+
+	async function handleNewFile() {
+		if (!verifyOTP()) return;
+		const newName = prompt("Enter new file name:");
+		if (!newName) return;
+		if (newName) {
+			await create(await path.join(currentWorkingDir, newName), {
+				baseDir: BaseDirectory.Home,
+			});
+			await navigateTo(currentWorkingDir);
+		} else {
+			alert("Please enter a valid file name.");
+		}
+	}
+
+	async function handleNewFolder() {
+		if (!verifyOTP()) return;
+		const newName = prompt("Enter new folder name:");
+		if (newName) {
+			await mkdir(await path.join(currentWorkingDir, newName));
+			await navigateTo(currentWorkingDir);
+		}
+	}
+
+	async function handleRename() {
+		if (!verifyOTP()) return;
+		const selected = document.querySelectorAll("#file-list li.selected");
+		console.log("Rename - Selected items:", selected.length);
+		if (selected.length !== 1) return;
+		console.log("Showing rename prompt");
+		const oldName = selected[0].querySelector(".name").textContent.trim();
+		const newName = prompt("Enter new name:", oldName);
+		if (newName && newName !== oldName) {
+			const oldPath = await path.join(currentWorkingDir, oldName);
+			const newPath = await path.join(currentWorkingDir, newName);
+			await rename(oldPath, newPath);
+			await navigateTo(currentWorkingDir);
+		}
+	}
+
+	async function handleDelete() {
+		if (!verifyOTP()) return;
+		const selected = document.querySelectorAll("#file-list li.selected");
+		console.log("Delete - Selected items:", selected.length);
+		if (selected.length === 0) return;
+		console.log("Showing delete confirmation");
+		if (confirm(`Delete ${selected.length} item(s)?`)) {
+			for (const li of selected) {
+				const name = li.querySelector(".name").textContent.trim();
+				await remove(await path.join(currentWorkingDir, name), {
+					recursive: true,
+				});
+			}
+			await navigateTo(currentWorkingDir);
+		}
+	}
+
+	async function handleCopy() {
+		if (!verifyOTP()) return;
+		copiedFiles = [];
+		const selectedItems = document.querySelectorAll(
+			"#file-list li.selected",
+		);
+		for (const li of selectedItems) {
+			const name = li.querySelector(".name").textContent.trim();
+			const fullPath = await path.join(currentWorkingDir, name);
+			copiedFiles.push(fullPath);
+		}
+		document.getElementById("status-message").textContent =
+			`${copiedFiles.length} file(s) copied to clipboard.`;
+		setTimeout(
+			() => (document.getElementById("status-message").textContent = ""),
+			3000,
+		);
+	}
+
+	async function handlePaste() {
+		if (!verifyOTP()) return;
+		for (const file of copiedFiles) {
+			const name = await path.basename(file);
+			const targetPath = await path.join(currentWorkingDir, name);
+			await copyFile(file, targetPath);
+		}
+		await navigateTo(currentWorkingDir);
+		document.getElementById("status-message").textContent =
+			`${copiedFiles.length} file(s) pasted.`;
+		setTimeout(
+			() => (document.getElementById("status-message").textContent = ""),
+			3000,
+		);
+	}
+
+	async function handleRefresh() {
+		if (!verifyOTP()) return;
+		await navigateTo(currentWorkingDir);
+	}
+
+	async function gotoSettings() {
+		if (!verifyOTP()) return;
+		window.location.href = "/settings";
+	}
+
+	document
+		.getElementById("new-file-btn")
+		?.addEventListener("click", handleNewFile);
+	document
+		.getElementById("new-folder-btn")
+		?.addEventListener("click", handleNewFolder);
+	document
+		.getElementById("delete-btn")
+		?.addEventListener("click", handleDelete);
+	document
+		.getElementById("rename-btn")
+		?.addEventListener("click", handleRename);
+	document.getElementById("copy-btn")?.addEventListener("click", handleCopy);
+	document
+		.getElementById("paste-btn")
+		?.addEventListener("click", handlePaste);
+	document
+		.getElementById("refresh-btn")
+		?.addEventListener("click", handleRefresh);
+	document
+		.getElementById("settings-btn")
+		?.addEventListener("click", gotoSettings);
+
+	document
+		.getElementById("cm-new-file")
+		?.addEventListener("click", handleNewFile);
+	document
+		.getElementById("cm-new-folder")
+		?.addEventListener("click", handleNewFolder);
+	document
+		.getElementById("cm-delete")
+		?.addEventListener("click", handleDelete);
+	document
+		.getElementById("cm-rename")
+		?.addEventListener("click", handleRename);
+	document.getElementById("cm-copy")?.addEventListener("click", handleCopy);
+	document.getElementById("cm-paste")?.addEventListener("click", handlePaste);
+	document
+		.getElementById("cm-refresh")
+		?.addEventListener("click", handleRefresh);
+
+	function showContextMenu(e) {
+		e.preventDefault();
+		const menu = document.getElementById("context-menu");
+		if (!menu) return;
+		menu.style.display = "block";
+		const main = document.querySelector("main");
+		if (!main) return;
+		const mainRect = main.getBoundingClientRect();
+		const availableWidth = Math.min(
+			main.clientWidth,
+			window.innerWidth - mainRect.left,
+		);
+		const availableHeight = Math.min(
+			main.clientHeight,
+			window.innerHeight - mainRect.top,
+		);
+		let posX = e.clientX - mainRect.left;
+		let posY = e.clientY - mainRect.top;
+		const menuRect = menu.getBoundingClientRect();
+		if (posX + menuRect.width > availableWidth)
+			posX = availableWidth - menuRect.width;
+		if (posY + menuRect.height > availableHeight)
+			posY = availableHeight - menuRect.height;
+		menu.style.left = Math.max(posX, 0) + "px";
+		menu.style.top = Math.max(posY, 0) + "px";
+	}
+
+	function hideContextMenu() {
+		document.getElementById("context-menu").style.display = "none";
+	}
+
+	document.addEventListener("contextmenu", (e) => {
+		if (
+			e.target.closest("#file-list") ||
+			e.target.closest("#actions") ||
+			e.target.closest("main")
+		) {
+			showContextMenu(e);
+		} else {
+			hideContextMenu();
+		}
+	});
+
+	document.addEventListener("click", () => {
+		hideContextMenu();
+	});
 </script>
 
-<style>
+<style is:global>
 	#file-list {
 		list-style: none;
 		padding: 0;
 		margin: 0;
+		margin-top: 5em;
 	}
 	#file-list li {
-		padding: 8px;
-		border-bottom: 1px solid #ccc;
 		display: flex;
 		align-items: center;
 	}
 	#file-list li:hover,
 	#file-list li.selecting {
-		background-color: #333; /* hovered/dragging: dark background */
+		background-color: #dbdbdb;
 	}
 	#file-list li.selected {
-		background-color: #007BFF; /* selected: blue background */
+		background-color: #007bff59;
 	}
 	#file-list .icon {
 		margin-right: 8px;
@@ -282,5 +680,81 @@ import Layout from "../layouts/Layout.astro";
 		pointer-events: none;
 		z-index: 99;
 		position: absolute;
+	}
+	#actions {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		z-index: 3000;
+		background-color: white;
+		display: flex;
+		flex-direction: row;
+	}
+	#actions .toolbar {
+		display: flex;
+		flex-direction: row;
+		gap: 0.5em;
+	}
+	#actions .toolbar button {
+		color: #333;
+		border: none;
+		cursor: pointer;
+		display: flex;
+		border: 1px solid #ccc;
+		padding: 0.5em;
+		box-shadow: none;
+		padding: none;
+		border-radius: 5px;
+		flex-direction: column;
+		align-items: center;
+		height: 70px;
+	}
+	#actions .toolbar button:hover {
+		background-color: #dcdcdc;
+	}
+	#actions .toolbar button:disabled {
+		background-color: #f0f0f0;
+		color: #999;
+	}
+	#actions .toolbar button:disabled:hover {
+		background-color: #f0f0f0;
+	}
+	#actions .toolbar button .icon {
+		font-size: 1.5em;
+	}
+	#actions .toolbar button p {
+		margin: 0;
+		font-size: 0.8em;
+	}
+	#path {
+		display: flex;
+		align-items: center;
+		padding: 0.5em;
+		width: 100%;
+	}
+	#path-input {
+		flex: 1;
+		border: none;
+		border-radius: 4px;
+		padding: 0.5em;
+		font-size: 1em;
+	}
+	#context-menu {
+		background: #fff;
+		border: 1px solid #ccc;
+	}
+	#context-menu ul {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+	#context-menu ul li {
+		padding: 0.5em 1em;
+		cursor: pointer;
+		white-space: nowrap;
+	}
+	#context-menu ul li:hover {
+		background-color: #f0f0f0;
 	}
 </style>
