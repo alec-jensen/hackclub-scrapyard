@@ -1,0 +1,33 @@
+{
+    "$schema": "../gen/schemas/desktop-schema.json",
+    "identifier": "default",
+    "description": "Default capabilities for the main window",
+    "windows": [
+        "main"
+    ],
+    "permissions": [
+        "fs:default",
+        "fs:read-all",
+        "fs:write-all",
+        "fs:allow-rename",
+        "fs:allow-mkdir",
+        "fs:allow-exists",
+        "fs:allow-watch",
+        "fs:read-dirs",
+        {
+            "identifier": "fs:scope",
+            "allow": [
+                {
+                    "path": "**/*",
+                    "allow_hidden": true
+                }
+            ],
+            "require_literal_leading_dot": false
+        },
+        "core:path:allow-resolve",
+        "core:path:allow-resolve-directory",
+        "core:path:allow-basename",
+        "core:path:allow-dirname",
+        "core:path:allow-join"
+    ]
+}
