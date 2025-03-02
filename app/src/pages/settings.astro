@@ -1,0 +1,33 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="Settings">
+    <main>
+        <h1>Settings</h1>
+        <button id="reset-file-manager">Reset File Manager</button>
+        <a href="/setup">Setup</a>
+        <a href="/">Home</a>
+    </main>
+</Layout>
+
+<script>
+    import { load } from "@tauri-apps/plugin-store";
+
+    let store = await load("file-manager");
+
+    document
+        .getElementById("reset-file-manager")
+        ?.addEventListener("click", () => {
+            store.clear();
+            alert("File Manager has been reset");
+        });
+</script>
+
+<style>
+    main {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+</style>
