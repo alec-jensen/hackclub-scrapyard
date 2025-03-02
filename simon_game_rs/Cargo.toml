@@ -1,0 +1,30 @@
+[package]
+name = "simon_game"
+version = "0.1.0"
+edition = "2021"
+authors = ["Boo"]
+description = "UWU"
+license = "MIT"
+repository = "https://github.com/alec-jensen/hackclub-scrapyard"
+readme = "README.md"
+keywords = ["serial", "keyboard", "game", "ffi", "simon"]
+categories = ["api-bindings", "hardware-support", "game-dev"]
+
+[dependencies]
+lazy_static = "1.4.0"
+
+[dev-dependencies]
+# For testing
+mockall = "0.11.3"
+
+[build-dependencies]
+cc = "1.0"
+
+[features]
+default = []
+# Feature flag for tests requiring real hardware
+hardware_tests = []
+
+[lib]
+# Make internal FFI types available to tests
+doctest = false

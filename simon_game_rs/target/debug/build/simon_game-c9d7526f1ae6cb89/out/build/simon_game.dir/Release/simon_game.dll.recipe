@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <ProjectOutputs>
+    <ProjectOutput>
+      <FullPath>C:\Users\brent\Documents\Programming Projects\HackClub\simon_game_rs\target\debug\build\simon_game-c9d7526f1ae6cb89\out\build\x64\Release\ZERO_CHECK</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
+      <FullPath>C:\Users\brent\Documents\Programming Projects\HackClub\simon_game_rs\target\debug\build\simon_game-c9d7526f1ae6cb89\out\build\bin\Release\simon_game.dll</FullPath>
+    </ProjectOutput>
+  </ProjectOutputs>
+  <ContentFiles />
+  <SatelliteDlls />
+  <NonRecipeFileRefs />
+</Project>

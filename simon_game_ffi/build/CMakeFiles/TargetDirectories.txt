@@ -1,0 +1,4 @@
+C:/Users/brent/Documents/Programming Projects/HackClub/simon_game_ffi/build/CMakeFiles/simon_game.dir
+C:/Users/brent/Documents/Programming Projects/HackClub/simon_game_ffi/build/CMakeFiles/INSTALL.dir
+C:/Users/brent/Documents/Programming Projects/HackClub/simon_game_ffi/build/CMakeFiles/ALL_BUILD.dir
+C:/Users/brent/Documents/Programming Projects/HackClub/simon_game_ffi/build/CMakeFiles/ZERO_CHECK.dir

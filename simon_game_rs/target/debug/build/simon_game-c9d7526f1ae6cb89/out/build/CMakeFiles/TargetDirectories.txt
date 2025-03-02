@@ -1,0 +1,4 @@
+C:/Users/brent/Documents/Programming Projects/HackClub/simon_game_rs/target/debug/build/simon_game-c9d7526f1ae6cb89/out/build/CMakeFiles/simon_game.dir
+C:/Users/brent/Documents/Programming Projects/HackClub/simon_game_rs/target/debug/build/simon_game-c9d7526f1ae6cb89/out/build/CMakeFiles/INSTALL.dir
+C:/Users/brent/Documents/Programming Projects/HackClub/simon_game_rs/target/debug/build/simon_game-c9d7526f1ae6cb89/out/build/CMakeFiles/ALL_BUILD.dir
+C:/Users/brent/Documents/Programming Projects/HackClub/simon_game_rs/target/debug/build/simon_game-c9d7526f1ae6cb89/out/build/CMakeFiles/ZERO_CHECK.dir
