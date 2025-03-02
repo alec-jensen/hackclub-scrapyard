@@ -7,17 +7,45 @@
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width" />
 	</head>
-	<body>
-		<slot />
+  <body>
+    <header>
+      <i class="nf nf-fa-angle_left"/>
+      <i class="nf nf-fa-angle_right"/>
+      <input type="text" placeholder="Search"/>
+      <i class="nf nf-fa-window_minimize"/>
+      <i class="nf nf-fa-window_maximize"/>
+      <i class="nf nf-fa-window_close"/>
+    </header>
+    <div id="main-container">
+      <nav><ul>
+        <li>📁 Home</li>
+        <li>📁 Desktop</li>
+        <li>📁 Documents</li>
+        <li>📁 Downloads</li>
+        <li>📁 Pictures</li>
+        <li>📁 Videos</li>
+        <hr>
+        <li><details><summary>📁 Home</summary><ul>
+          <li>📁 Videos</li>
+          <li>📁 Videos</li>
+          <li><details><summary>📁 Home</summary><ul>
+            <li>📁 Videos</li>
+            <li>📁 Videos</li>
+          </ul></details></li>
+        </ul></details></li>
+      </ul></nav>
+      <slot/>
+    </div>
 	</body>
 </html>
 
 <style is:global>
+  @import "https://www.nerdfonts.com/assets/css/webfont.css";
 	:root {
 		font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
 		font-size: 16px;
 		line-height: 24px;
-		font-weight: 400;
+    font-weight: 400;
 
 		color: #0f0f0f;
 		background-color: white;
@@ -27,7 +55,8 @@
 		-webkit-font-smoothing: antialiased;
 		-moz-osx-font-smoothing: grayscale;
 		-webkit-text-size-adjust: 100%;
-	}
+  }
+  body {margin: 0;}
 
 	.logo {
 		height: 6em;
@@ -81,16 +110,32 @@
 	input,
 	button {
 		outline: none;
-	}
+  }
+  #main-container, header {display: flex; gap: 1rem;}
+  header {
+    align-items:center;
+    position: sticky; top: 0; box-sizing: border-box;
+    width: 100%; z-index: 100; padding: 1rem;
+    background-color: #222024; height: 3rem;
+  }
+  header>input {flex-grow: 1;}
+  #main-container {background-color: #2B292E;}
+  #main-container>nav {
+    flex-basis: 10rem; padding: 1rem;
+    position: sticky; top: 3rem; height: 100%;
+  }
+  #main-container>nav ul {padding: 0; margin: 0; list-style: none; height: 100%;}
+  main {width: 100%; padding-left: 1.5rem; background-color: #333036;}
+  #file-list li:hover {background-color: #49454D;}
 
 	@media (prefers-color-scheme: dark) {
 		:root {
-			color: white;
-			background-color: #2f2f2f;
+			color: #C7C5C9;
+			background-color: #333036;
 		}
 
 		a:hover {
-			color: #24c8db;
+			color: #00AAFF;
 		}
 
 		input,
