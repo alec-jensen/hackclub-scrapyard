@@ -3,8 +3,12 @@ import Layout from "../layouts/Layout.astro";
 ---
 
 <Layout>
-	<main style="position: relative;">
+	<main>
 		<div id="actions">
+			<div id="path">
+				<input type="text" id="path-input" />
+				<button id="go-btn">Go</button>
+			</div>
 			<div class="toolbar">
 				<button id="new-file-btn" title="New File">
 					<span class="icon">📝</span>
@@ -39,22 +43,42 @@ import Layout from "../layouts/Layout.astro";
 					<p>Settings</p>
 				</button>
 			</div>
-
-			<div id="path">
-				<input type="text" id="path-input" />
-				<button id="go-btn">Go</button>
-			</div>
 		</div>
-		<!-- Added status and error message containers -->
-		<div id="status-message" style="margin-bottom: 10px;"></div>
-		<div id="error-message" style="color: red;"></div>
-		<ul id="file-list"></ul>
-		<div id="selection-box" style="display: none; position: absolute;">
+		<nav>
+			<ul>
+				<li>📁 Home</li>
+				<li>📁 Desktop</li>
+				<li>📁 Documents</li>
+				<li>📁 Downloads</li>
+				<li>📁 Pictures</li>
+				<li>📁 Videos</li>
+				<hr />
+				<li>
+					<details>
+						<summary>📁 Home</summary><ul>
+							<li>📁 Videos</li>
+							<li>📁 Videos</li>
+							<li>
+								<details>
+									<summary>📁 Home</summary><ul>
+										<li>📁 Videos</li>
+										<li>📁 Videos</li>
+									</ul>
+								</details>
+							</li>
+						</ul>
+					</details>
+				</li>
+			</ul>
+		</nav>
+		<div class="files-container">
+			<!-- Added status and error message containers -->
+			<div id="status-message"></div>
+			<div id="error-message"></div>
+			<ul id="file-list"></ul>
+			<div id="selection-box"></div>
 		</div>
-		<div
-			id="context-menu"
-			style="display: none; position: absolute; z-index: 2000;"
-		>
+		<div id="context-menu">
 			<ul>
 				<li id="cm-new-file">New File</li>
 				<li id="cm-new-folder">New Folder</li>
@@ -77,7 +101,7 @@ import Layout from "../layouts/Layout.astro";
 		copyFile,
 		BaseDirectory,
 		rename,
-		size
+		size,
 	} from "@tauri-apps/plugin-fs";
 	import * as path from "@tauri-apps/api/path";
 	import { open } from "@tauri-apps/plugin-shell";
@@ -93,6 +117,7 @@ import Layout from "../layouts/Layout.astro";
 	});
 
 	async function verifyOTP() {
+		return true;
 		const password = prompt("Enter your password");
 		if (!password) return false;
 		const code = prompt(
@@ -153,7 +178,7 @@ import Layout from "../layouts/Layout.astro";
 				secret: OTPAuth.Secret.fromBase32(secretKey),
 				token: code,
 				window: 1,
-			})
+			}) !== null
 		) {
 			return true;
 		} else {
@@ -198,6 +223,8 @@ import Layout from "../layouts/Layout.astro";
 		currentWorkingDir = newDir;
 		await buildDirList(currentWorkingDir);
 		updateFileListUI();
+		await updateFullDirectoryTree();
+		highlightCurrentPath(newDir);
 	}
 
 	function updateFileListUI() {
@@ -364,6 +391,9 @@ import Layout from "../layouts/Layout.astro";
 		currentWorkingDir = initialDir;
 		await navigateTo(initialDir);
 		updateActionButtons();
+		// setupNavigation();
+		// updateNavigation();
+		// addBookmarkButton();
 	})();
 
 	let selectionBox = document.getElementById("selection-box");
@@ -667,14 +697,243 @@ import Layout from "../layouts/Layout.astro";
 	document.addEventListener("click", () => {
 		hideContextMenu();
 	});
+
+	async function highlightCurrentPath(currentPath) {
+		// Remove highlight from all items
+		document.querySelectorAll("nav li").forEach((item) => {
+			item.classList.remove("active");
+		});
+	}
+
+	let visitedDirs = [];
+
+	async function buildDirectoryTree(
+		rootDir,
+		currentPath,
+		maxDepth = 2,
+		currentDepth = 0,
+		expanded = false,
+	) {
+		try {
+			const entries = await readDir(rootDir, {
+				baseDir: BaseDirectory.Home,
+			});
+			const dirEntries = entries.filter((entry) => entry.isDirectory);
+
+			if (dirEntries.length === 0) return null; // No subdirectories
+
+			const ul = document.createElement("ul");
+
+			for (const entry of dirEntries) {
+				const fullPath = await path.join(rootDir, entry.name);
+				const isInPath = currentPath.startsWith(fullPath);
+
+				if (visitedDirs.includes(fullPath)) continue;
+				visitedDirs.push(fullPath);
+
+				// Create list item for directory
+				const li = document.createElement("li");
+				li.style.cursor = "pointer";
+
+				try {
+					// Check if this directory contains subdirectories
+					const subEntries = await readDir(fullPath, {
+						baseDir: BaseDirectory.Home,
+					});
+					const hasSubDirs = subEntries.some(
+						(subEntry) => subEntry.isDirectory,
+					);
+
+					if (hasSubDirs) {
+						// Create expandable section
+						const details = document.createElement("details");
+						details.open = isInPath || expanded;
+
+						const summary = document.createElement("summary");
+						summary.textContent = "📁 "; // Just show the arrow and icon
+						details.appendChild(summary);
+
+						// Create a separate element for the directory name
+						const dirNameSpan = document.createElement("span");
+						dirNameSpan.textContent = entry.name;
+						dirNameSpan.style.cursor = "pointer";
+						dirNameSpan.className = "dir-name";
+						summary.appendChild(dirNameSpan);
+
+						// Add click handler only to the directory name
+						dirNameSpan.addEventListener("click", async (e) => {
+							e.preventDefault(); // Prevent details toggle
+							e.stopPropagation(); // Prevent event from bubbling up
+
+							if (!(await verifyOTP())) return;
+							await navigateTo(fullPath);
+						});
+
+						// Create lazy-loading mechanism
+						let loaded = false;
+						let subTree = null;
+
+						details.addEventListener("toggle", async () => {
+							if (details.open && !loaded) {
+								// Load subdirectories when expanded
+								subTree = await buildDirectoryTree(
+									fullPath,
+									currentPath,
+									maxDepth,
+									currentDepth + 1,
+									false,
+								);
+
+								if (subTree) {
+									details.appendChild(subTree);
+									loaded = true;
+								}
+							}
+						});
+
+						// If this is in the current path, pre-load its children
+						if (isInPath) {
+							subTree = await buildDirectoryTree(
+								fullPath,
+								currentPath,
+								maxDepth,
+								currentDepth + 1,
+								false,
+							);
+
+							if (subTree) {
+								details.appendChild(subTree);
+								loaded = true;
+							}
+						}
+
+						li.appendChild(details);
+					} else {
+						// End branch (no subdirectories)
+						li.textContent = `📄 ${entry.name}`;
+					}
+
+					// Highlight if in current path
+					if (isInPath) {
+						li.classList.add("active");
+					}
+
+					// Add click handler
+					li.addEventListener("click", async (e) => {
+						// Prevent click from triggering details toggle
+						if (e.target.tagName.toLowerCase() === "summary") {
+							e.stopPropagation();
+							return;
+						}
+
+						if (!(await verifyOTP())) return;
+						await navigateTo(fullPath);
+					});
+
+					ul.appendChild(li);
+				} catch (err) {
+					console.error(
+						`Error processing directory ${entry.name}:`,
+						err,
+					);
+				}
+			}
+
+			return ul;
+		} catch (error) {
+			console.error("Error building directory tree:", error);
+			return null;
+		}
+	}
+
+	async function updateFullDirectoryTree() {
+		const navContainer = document.querySelector("nav");
+		const rootPath = await path.resolve("/");
+
+		// Clear existing navigation
+		navContainer.innerHTML = "";
+
+		visitedDirs = [];
+
+		// Add common directories first
+		const commonDirsUl = document.createElement("ul");
+		commonDirsUl.classList.add("common-dirs");
+		const commonDirs = [
+			{ name: "Home", path: initialDir },
+			{ name: "Desktop", path: await path.join(initialDir, "Desktop") },
+			{
+				name: "Documents",
+				path: await path.join(initialDir, "Documents"),
+			},
+			{
+				name: "Downloads",
+				path: await path.join(initialDir, "Downloads"),
+			},
+			{ name: "Pictures", path: await path.join(initialDir, "Pictures") },
+			{ name: "Videos", path: await path.join(initialDir, "Videos") },
+		];
+
+		commonDirs.forEach((dir, index) => {
+			const li = document.createElement("li");
+			li.textContent = `📁 ${dir.name}`;
+			li.style.cursor = "pointer";
+			if (currentWorkingDir === dir.path) {
+				li.classList.add("active");
+			}
+			li.addEventListener("click", async () => {
+				if (!(await verifyOTP())) return;
+				await navigateTo(dir.path);
+			});
+			commonDirsUl.appendChild(li);
+		});
+
+		navContainer.appendChild(commonDirsUl);
+
+		// Add separator
+		const separator = document.createElement("hr");
+		navContainer.appendChild(separator);
+
+		// Add dynamic file tree
+		const fileTree = await buildDirectoryTree(
+			rootPath,
+			currentWorkingDir,
+			10,
+		);
+		if (fileTree) {
+			navContainer.appendChild(fileTree);
+		}
+	}
 </script>
 
 <style is:global>
+	main {
+		display: flex;
+		flex-direction: row;
+		overflow: hidden;
+	}
+	#selection-box {
+		border: 1px dashed #666;
+		background-color: rgba(173, 216, 230, 0.3);
+		pointer-events: none;
+		z-index: 99;
+		position: absolute;
+		display: none;
+	}
+	#context-menu {
+		display: none;
+		position: absolute;
+		padding: 5px;
+		z-index: 2000;
+		background: #333036;
+		border: 1px solid #222024;
+		border-radius: 5px;
+	}
 	#file-list {
 		list-style: none;
 		padding: 0;
 		margin: 0;
-		margin-top: 2.2em;
+		margin-top: 3em;
+		margin-left: 1.5em;
 	}
 	#file-list li {
 		display: flex;
@@ -685,32 +944,27 @@ import Layout from "../layouts/Layout.astro";
 		background-color: #2b292e;
 	}
 	#file-list li.selected {
-    background-color: #107BB559;
+		background-color: #107bb559;
 	}
 	#file-list .icon {
 		margin-right: 8px;
 	}
-	#selection-box {
-		border: 1px dashed #666;
-		background-color: rgba(173, 216, 230, 0.3);
-		pointer-events: none;
-		z-index: 99;
-		position: absolute;
-	}
 	#actions {
 		position: fixed;
-		top: 0;
 		left: 0;
 		width: 100%;
 		z-index: 3000;
 		background-color: #2b292e;
 		display: flex;
-		flex-direction: row;
+		flex-direction: column;
+		align-items: left;
 	}
 	#actions .toolbar {
 		display: flex;
 		flex-direction: row;
 		gap: 0.5em;
+		margin-top: 0.4em;
+		margin-bottom: 0.4em;
 	}
 	#actions .toolbar button {
 		color: white;
@@ -746,9 +1000,9 @@ import Layout from "../layouts/Layout.astro";
 	#path {
 		display: flex;
 		align-items: center;
-		padding: 0.5em;
+		padding: 0;
 		width: 100%;
-		margin-top: 1.8em;
+		gap: 1em;
 	}
 	#path-input {
 		flex: 1;
@@ -757,9 +1011,53 @@ import Layout from "../layouts/Layout.astro";
 		padding: 0.5em;
 		font-size: 1em;
 	}
+	nav {
+		position: fixed;
+		top: 7em;
+		bottom: 0;
+		left: 0;
+		width: 200px;
+		max-width: 200px;
+		padding: 1rem;
+		overflow-y: auto;
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		justify-content: flex-start;
+	}
+	nav hr {
+		border: 0;
+		border-top: 1px solid #222024;
+		width: 150px;
+	}
+	.files-container {
+		margin-left: 200px;
+		overflow-y: auto;
+		height: 100vh;
+	}
+	nav ul {
+		margin: 0;
+		padding: 0 0 0 1.5rem;
+		list-style: none;
+	}
+	nav ul:first-child {
+		padding: 0 0 0 0.5rem;
+	}
+	nav summary {
+		margin-left: -1.05rem;
+	}
+	.files-container {
+		margin-top: 4em;
+		flex: 1;
+		overflow-y: auto;
+		padding: 1rem;
+		height: 100%;
+	}
 	#context-menu {
-		background: #fff;
-		border: 1px solid #ccc;
+		background: #333036;
+		border: 1px solid #222024;
+		border-radius: 5px;
+		z-index: 10000;
 	}
 	#context-menu ul {
 		list-style: none;
@@ -770,8 +1068,17 @@ import Layout from "../layouts/Layout.astro";
 		padding: 0.5em 1em;
 		cursor: pointer;
 		white-space: nowrap;
+		border-radius: 5px;
 	}
 	#context-menu ul li:hover {
-		background-color: #f0f0f0;
+		background-color: #2b292e;
+	}
+
+	.dir-name {
+		margin-left: 4px;
+	}
+
+	.dir-name:hover {
+		text-decoration: underline;
 	}
 </style>

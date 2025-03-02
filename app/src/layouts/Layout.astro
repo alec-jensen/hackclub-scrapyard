@@ -1,51 +1,35 @@
 ---
+
 ---
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width" />
 	</head>
-  <body>
-    <header>
-      <i class="nf nf-fa-angle_left"/>
-      <i class="nf nf-fa-angle_right"/>
-      <input type="text" placeholder="Search"/>
-      <i class="nf nf-fa-window_minimize"/>
-      <i class="nf nf-fa-window_maximize"/>
-      <i class="nf nf-fa-window_close"/>
-    </header>
-    <div id="main-container">
-      <nav><ul>
-        <li>📁 Home</li>
-        <li>📁 Desktop</li>
-        <li>📁 Documents</li>
-        <li>📁 Downloads</li>
-        <li>📁 Pictures</li>
-        <li>📁 Videos</li>
-        <hr>
-        <li><details><summary>📁 Home</summary><ul>
-          <li>📁 Videos</li>
-          <li>📁 Videos</li>
-          <li><details><summary>📁 Home</summary><ul>
-            <li>📁 Videos</li>
-            <li>📁 Videos</li>
-          </ul></details></li>
-        </ul></details></li>
-      </ul></nav>
-      <slot/>
-    </div>
+	<body>
+		<!-- <header>
+			<i class="nf nf-fa-angle_left"></i>
+			<i class="nf nf-fa-angle_right"></i>
+			<input type="text" placeholder="Search" />
+			<i class="nf nf-fa-window_minimize"></i>
+			<i class="nf nf-fa-window_maximize"></i>
+			<i class="nf nf-fa-window_close"></i>
+		</header> -->
+		<div id="main-container">
+			<slot />
+		</div>
 	</body>
 </html>
 
 <style is:global>
-  @import "https://www.nerdfonts.com/assets/css/webfont.css";
+	@import "https://www.nerdfonts.com/assets/css/webfont.css";
 	:root {
 		font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
 		font-size: 16px;
 		line-height: 24px;
-    font-weight: 400;
+		font-weight: 400;
 
 		color: #0f0f0f;
 		background-color: white;
@@ -55,8 +39,10 @@
 		-webkit-font-smoothing: antialiased;
 		-moz-osx-font-smoothing: grayscale;
 		-webkit-text-size-adjust: 100%;
-  }
-  body {margin: 0;}
+	}
+	body {
+		margin: 0;
+	}
 
 	.logo {
 		height: 6em;
@@ -73,7 +59,7 @@
 
 	a {
 		font-weight: 500;
-		color: #49454D;
+		color: #49454d;
 		text-decoration: inherit;
 	}
 
@@ -110,39 +96,46 @@
 	input,
 	button {
 		outline: none;
-  }
-  #main-container, header {display: flex; gap: 1rem;}
-  header {
-    align-items:center;
-    position: sticky; top: 0; box-sizing: border-box;
-    width: 100%; z-index: 100; padding: 1rem;
-    background-color: #222024; height: 3rem;
-  }
-  header>input {flex-grow: 1;}
-  #main-container {background-color: #2B292E;}
-  #main-container>nav {
-    flex-basis: 10rem; padding: 1rem;
-    position: sticky; top: 3rem; height: 100vh;
-  }
-  #main-container>nav ul {margin: 0; padding: 0 0 0 1.5rem; list-style: none; height: 100%;}
-  #main-container>nav ul:first-child {padding: 0 0 0 .5rem;}
-  #main-container>nav summary {margin-left: -1.05rem;}
-  #main-container>*:not(:first-child) {width: 100%; padding-left: 1.5rem; background-color: #333036;}
-  #file-list li:hover {background-color: #49454D;}
+	}
+	#main-container,
+	header {
+		display: flex;
+		gap: 1rem;
+	}
+	header {
+		align-items: center;
+		position: sticky;
+		top: 0;
+		box-sizing: border-box;
+		width: 100%;
+		z-index: 100;
+		padding: 1rem;
+		background-color: #222024;
+		height: 3rem;
+	}
+	header > input {
+		flex-grow: 1;
+	}
+	#main-container {
+		background-color: #2b292e;
+	}
+	#file-list li:hover {
+		background-color: #49454d;
+	}
 
 	@media (prefers-color-scheme: dark) {
 		:root {
-			color: #C7C5C9;
+			color: #c7c5c9;
 			background-color: #333036;
 		}
 
 		a:hover {
-			color: #49454D;
+			color: #49454d;
 		}
 
 		input,
 		button {
-			color: #C7C5C9;
+			color: #c7c5c9;
 			background-color: #222024;
 		}
 	}
