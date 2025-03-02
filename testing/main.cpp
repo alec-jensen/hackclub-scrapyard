@@ -1,31 +1,61 @@
 #include "middleWhere.hpp"
 #include "Logger.hpp"
+#include "SerialCommunication.hpp"
 #include <iostream>
 #include <chrono>
 #include <thread>
+#include <map>
 
-class MockHardware {
-public:
-    static void simulateProgress(int target) {
-        LOG_DEBUG("Starting hardware simulation with target: " + std::to_string(target));
-        for(int i = 0; i < target; i++) {
-            std::cout << "Progress: " << i + 1 << "/" << target << "\r" << std::flush;
-            Sleep(100);
-        }
-        LOG_DEBUG("Hardware simulation complete for target: " + std::to_string(target));
-        std::cout << "\nComplete!" << std::endl;
-    }
+// Global serial communication object
+SerialCommunication serialComm;
+
+// Define the key to pattern mapping
+std::map<WORD, std::vector<int>> keyPatterns = {
+    {'W', {1, 2, 3, 2, 1}},      // Example pattern for W key
+    {'A', {3, 1, 3, 1}},         // Example pattern for A key
+    {'S', {2, 4, 2, 1, 3, 4}},   // Example pattern for S key
+    {'D', {4, 3, 2, 1}},         // Example pattern for D key
+    {VK_SPACE, {1, 2, 3, 4, 4, 3, 2, 1}} // Example pattern for SPACE key
 };
 
-void testSendToHardware(int counter) {
-    LOG_INFO("Sending counter to hardware: " + std::to_string(counter));
-    MockHardware::simulateProgress(counter);
+void sendToHardware(int counter) {
+    LOG_INFO("Sending pattern to hardware with complexity: " + std::to_string(counter));
+    
+    WORD lastPressedKey = 0;
+    
+    // Find which key was last pressed (this is a simple approach - you might need to enhance this)
+    for (const auto& keyConfig : keyPatterns) {
+        if (keyConfig.second.size() == counter) {
+            lastPressedKey = keyConfig.first;
+            break;
+        }
+    }
+    
+    // If key pattern found, send it to the hardware
+    if (lastPressedKey != 0 && keyPatterns.find(lastPressedKey) != keyPatterns.end()) {
+        LOG_INFO("Sending pattern for key: " + std::to_string(lastPressedKey));
+        serialComm.sendPattern(keyPatterns[lastPressedKey]);
+    } else {
+        LOG_WARNING("No pattern defined for the pressed key with counter: " + std::to_string(counter));
+    }
 }
 
-bool testReceiveFromHardware() {
-    LOG_INFO("Receiving verification from hardware");
-    std::cout << "Hardware verification complete" << std::endl;
-    return true;
+bool receiveFromHardware() {
+    LOG_INFO("Waiting for hardware to verify pattern completion");
+    
+    // Wait a brief moment for the user to interact with the hardware
+    Sleep(500);
+    
+    // Check if the pattern was completed successfully
+    bool success = serialComm.verifyPatternCompleted();
+    
+    if (success) {
+        LOG_MAIN("Pattern successfully completed on hardware!");
+    } else {
+        LOG_WARNING("Pattern verification failed or timed out");
+    }
+    
+    return success;
 }
 
 void setupConsole() {
@@ -39,7 +69,7 @@ void setupConsole() {
     if (!fpstderr)
         MessageBoxA(NULL, "Failed to redirect stderr", "Error", MB_OK | MB_ICONERROR);
     
-    SetConsoleTitleA("Keyboard Middleware Console");
+    SetConsoleTitleA("Simon Game Keyboard Middleware");
     
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
     if (hConsole != INVALID_HANDLE_VALUE) {
@@ -60,14 +90,21 @@ int WINAPI WinMain([[maybe_unused]] HINSTANCE hInstance, [[maybe_unused]] HINSTA
     
     setupConsole();
     
-
-    if (!Logger::initialize("keyboard_middleware.log", Logger::LogLevel::DEBUG)) {
+    if (!Logger::initialize("simon_game_middleware.log", Logger::LogLevel::DEBUG)) {
         std::cerr << "Failed to initialize logger!" << std::endl;
-    } else {
-        LOG_INFO("Logger initialized successfully");
+        return 1;
     }
     
-    LOG_MAIN("Application starting...");
+    LOG_MAIN("Simon Game Application starting...");
+    
+    // Try to connect to the hardware
+    if (!serialComm.connect()) {
+        LOG_ERROR("Failed to connect to Simon game hardware! Check connections and port settings.");
+        MessageBoxA(NULL, "Failed to connect to Simon game hardware! Check connections and port settings.", 
+                    "Connection Error", MB_OK | MB_ICONERROR);
+        Logger::shutdown();
+        return 1;
+    }
     
     if (!KeyboardMiddleware::Initialize()) {
         LOG_ERROR("Middleware initialization failed!");
@@ -76,15 +113,18 @@ int WINAPI WinMain([[maybe_unused]] HINSTANCE hInstance, [[maybe_unused]] HINSTA
         return 1;
     }
 
-    KeyboardMiddleware::RegisterKey('W', 5); 
-    KeyboardMiddleware::RegisterKey('A', 3); 
-    KeyboardMiddleware::RegisterKey('S', 7);  
-    KeyboardMiddleware::RegisterKey('D', 4); 
-    KeyboardMiddleware::RegisterKey(VK_SPACE, 10);
+    // Register keys with their pattern complexity
+    KeyboardMiddleware::RegisterKey('W', keyPatterns['W'].size()); 
+    KeyboardMiddleware::RegisterKey('A', keyPatterns['A'].size()); 
+    KeyboardMiddleware::RegisterKey('S', keyPatterns['S'].size());  
+    KeyboardMiddleware::RegisterKey('D', keyPatterns['D'].size()); 
+    KeyboardMiddleware::RegisterKey(VK_SPACE, keyPatterns[VK_SPACE].size());
 
-    KeyboardMiddleware::RegisterHardwareCallbacks(testSendToHardware, testReceiveFromHardware);
+    // Register our hardware callbacks
+    KeyboardMiddleware::RegisterHardwareCallbacks(sendToHardware, receiveFromHardware);
     
     LOG_MAIN("Application ready - waiting for keyboard events");
+    std::cout << "Press a registered key (W, A, S, D or SPACE) to send a pattern to the Simon game." << std::endl;
 
     MSG msg;
     while (GetMessage(&msg, NULL, 0, 0)) {
@@ -93,6 +133,7 @@ int WINAPI WinMain([[maybe_unused]] HINSTANCE hInstance, [[maybe_unused]] HINSTA
     }
 
     KeyboardMiddleware::Cleanup();
+    serialComm.disconnect();
     
     LOG_MAIN("Application shutting down");
     Logger::shutdown();
