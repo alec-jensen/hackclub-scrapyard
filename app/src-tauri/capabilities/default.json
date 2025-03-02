@@ -55,6 +55,7 @@
                     "url": "http://**"
                 }
             ]
-        }
+        },
+        "fs:allow-size"
     ]
 }

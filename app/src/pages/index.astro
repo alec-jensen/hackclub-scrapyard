@@ -336,6 +336,12 @@ import Layout from "../layouts/Layout.astro";
 				nameSpan.title = file.name;
 				fileEntry.appendChild(nameSpan);
 
+				path.join(currentWorkingDir, file.name).then((filePath) => {
+					size(filePath).then((size) => {
+						nameSpan.textContent += ` (${size} bytes)`;
+					});
+				});
+
 				if (file.isFile) {
 					fileEntry.style.cursor = "pointer";
 					fileEntry.addEventListener("dblclick", async (e) => {
@@ -372,6 +378,7 @@ import Layout from "../layouts/Layout.astro";
 	}
 
 	document.getElementById("go-btn").addEventListener("click", async () => {
+		if (!(await verifyOTP())) return;
 		const newPath = document.getElementById("path-input").value;
 		await navigateTo(newPath);
 	});
@@ -380,6 +387,7 @@ import Layout from "../layouts/Layout.astro";
 		.getElementById("path-input")
 		.addEventListener("keydown", async (e) => {
 			if (e.key === "Enter") {
+				if (!(await verifyOTP())) return;
 				const newPath = document.getElementById("path-input").value;
 				await navigateTo(newPath);
 			}
@@ -940,7 +948,7 @@ import Layout from "../layouts/Layout.astro";
 	}
 	#file-list li:hover,
 	#file-list li.selecting {
-		background-color: #2b292e;
+		background-color: #49454D;
 	}
 	#file-list li.selected {
 		background-color: #107bb559;
