@@ -1,7 +1,6 @@
 #include "middleWhere.hpp"
 #include <iostream>
 
-// Initialize static members
 std::atomic<bool> KeyboardMiddleware::blockKeys(false);
 HHOOK KeyboardMiddleware::keyboardHook = NULL;
 std::vector<KeyboardMiddleware::KeyConfig> KeyboardMiddleware::keyConfigs;
@@ -12,7 +11,7 @@ std::function<void(int)> KeyboardMiddleware::sendToHardwareCallback;
 std::function<bool()> KeyboardMiddleware::receiveFromHardwareCallback;
 
 void KeyboardMiddleware::LogMessage(const std::string& message) {
-    Logger::log(Logger::LogLevel::MAIN, message);
+    LOG_DEBUG("Middleware: " + message);
 }
 
 void KeyboardMiddleware::SendResponseToApplication(WORD key) {
@@ -21,15 +20,18 @@ void KeyboardMiddleware::SendResponseToApplication(WORD key) {
         [key](const KeyConfig& config) { return config.key == key; });
 
     if (keyConfig != keyConfigs.end()) {
+        LOG_INFO("Processing key response for key: " + std::to_string(key) + 
+                 " with target counter: " + std::to_string(keyConfig->targetCounter));
+        
         if (sendToHardwareCallback) {
             sendToHardwareCallback(keyConfig->targetCounter);
         }
         
         if (receiveFromHardwareCallback && receiveFromHardwareCallback()) {
-            LogMessage("Hardware verification successful");
+            LOG_INFO("Hardware verification successful for key: " + std::to_string(key));
             blockKeys = false;
         } else {
-            LogMessage("Hardware verification failed");
+            LOG_WARNING("Hardware verification failed for key: " + std::to_string(key));
         }
     }
 }
@@ -48,10 +50,11 @@ LRESULT CALLBACK KeyboardMiddleware::LowLevelKeyboardProc(int nCode, WPARAM wPar
 
         if (keyConfig != keyConfigs.end()) {
             if (blockKeys) {
-                LogMessage("Key blocked: " + std::to_string(key));
+                LOG_DEBUG("Key blocked: " + std::to_string(key));
                 return 1;
             }
 
+            LOG_INFO("Registered key pressed: " + std::to_string(key));
             blockKeys = true;
             std::thread([key]() {
                 SendResponseToApplication(key);
@@ -65,7 +68,7 @@ LRESULT CALLBACK KeyboardMiddleware::LowLevelKeyboardProc(int nCode, WPARAM wPar
 }
 
 bool KeyboardMiddleware::Initialize() {
-    LogMessage("Initializing keyboard middleware...");
+    LOG_MAIN("Initializing keyboard middleware...");
     
     keyboardHook = SetWindowsHookEx(
         WH_KEYBOARD_LL,
@@ -75,23 +78,23 @@ bool KeyboardMiddleware::Initialize() {
     );
 
     if (!keyboardHook) {
-        LogMessage("Failed to initialize keyboard hook");
+        LOG_ERROR("Failed to initialize keyboard hook, GetLastError: " + std::to_string(GetLastError()));
         return false;
     }
 
-    LogMessage("Keyboard middleware initialized successfully");
+    LOG_MAIN("Keyboard middleware initialized successfully");
     return true;
 }
 
 void KeyboardMiddleware::RegisterKey(WORD key, int targetCount) {
     keyConfigs.emplace_back(key, targetCount);
-    LogMessage("Registered key: " + std::to_string(key) + 
-              " with target count: " + std::to_string(targetCount));
+    LOG_INFO("Registered key: " + std::to_string(key) + 
+             " with target count: " + std::to_string(targetCount));
 }
 
 void KeyboardMiddleware::SetTargetCounter(int counter) {
     targetCounter.store(counter);
-    LogMessage("Set target counter to: " + std::to_string(counter));
+    LOG_INFO("Set target counter to: " + std::to_string(counter));
 }
 
 void KeyboardMiddleware::RegisterHardwareCallbacks(
@@ -100,15 +103,15 @@ void KeyboardMiddleware::RegisterHardwareCallbacks(
 ) {
     sendToHardwareCallback = sendCallback;
     receiveFromHardwareCallback = receiveCallback;
-    LogMessage("Hardware callbacks registered");
+    LOG_INFO("Hardware callbacks registered");
 }
 
 void KeyboardMiddleware::Cleanup() {
     if (keyboardHook != NULL) {
         UnhookWindowsHookEx(keyboardHook);
         keyboardHook = NULL;
-        LogMessage("Keyboard hook cleaned up");
+        LOG_INFO("Keyboard hook cleaned up");
     }
     shouldExit = true;
-    LogMessage("Middleware cleanup complete");
+    LOG_MAIN("Middleware cleanup complete");
 }

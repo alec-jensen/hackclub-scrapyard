@@ -1,0 +1,45 @@
+[18.42.50.538] [INFO]: Logging initialized
+[18.42.50.538] [INFO] <0xe4> (main.cpp:67) Logger initialized successfully
+[18.42.50.539] [MAIN] <0xe4> (main.cpp:70) Application starting...
+[18.42.50.539] [MAIN] <0xe4> (middleWhere.cpp:71) Initializing keyboard middleware...
+[18.42.50.540] [MAIN] <0xe4> (middleWhere.cpp:85) Keyboard middleware initialized successfully
+[18.42.50.540] [INFO] <0xe4> (middleWhere.cpp:91) Registered key: 87 with target count: 5
+[18.42.50.541] [INFO] <0xe4> (middleWhere.cpp:91) Registered key: 65 with target count: 3
+[18.42.50.541] [INFO] <0xe4> (middleWhere.cpp:91) Registered key: 83 with target count: 7
+[18.42.50.542] [INFO] <0xe4> (middleWhere.cpp:91) Registered key: 68 with target count: 4
+[18.42.50.542] [INFO] <0xe4> (middleWhere.cpp:91) Registered key: 32 with target count: 10
+[18.42.50.542] [INFO] <0xe4> (middleWhere.cpp:106) Hardware callbacks registered
+[18.42.50.543] [MAIN] <0xe4> (main.cpp:87) Application ready - waiting for keyboard events
+[18.42.53.991] [INFO] <0xe4> (middleWhere.cpp:57) Registered key pressed: 87
+[18.42.53.993] [INFO] <0xf4> (middleWhere.cpp:23) Processing key response for key: 87 with target counter: 5
+[18.42.53.994] [INFO] <0xf4> (main.cpp:21) Sending counter to hardware: 5
+[18.42.53.996] [DEBUG] <0xf4> (main.cpp:10) Starting hardware simulation with target: 5
+[18.42.54.538] [DEBUG] <0xf4> (main.cpp:15) Hardware simulation complete for target: 5
+[18.42.54.539] [INFO] <0xf4> (main.cpp:26) Receiving verification from hardware
+[18.42.54.540] [INFO] <0xf4> (middleWhere.cpp:31) Hardware verification successful for key: 87
+[18.42.56.570] [INFO] <0xe4> (middleWhere.cpp:57) Registered key pressed: 68
+[18.42.56.572] [INFO] <0xf8> (middleWhere.cpp:23) Processing key response for key: 68 with target counter: 4
+[18.42.56.573] [INFO] <0xf8> (main.cpp:21) Sending counter to hardware: 4
+[18.42.56.574] [DEBUG] <0xf8> (main.cpp:10) Starting hardware simulation with target: 4
+[18.42.56.999] [DEBUG] <0xf8> (main.cpp:15) Hardware simulation complete for target: 4
+[18.42.57.001] [INFO] <0xf8> (main.cpp:26) Receiving verification from hardware
+[18.42.57.002] [INFO] <0xf8> (middleWhere.cpp:31) Hardware verification successful for key: 68
+[18.46.13.622] [INFO] <0xe4> (middleWhere.cpp:57) Registered key pressed: 65
+[18.46.13.624] [INFO] <0xf0> (middleWhere.cpp:23) Processing key response for key: 65 with target counter: 3
+[18.46.13.625] [INFO] <0xf0> (main.cpp:21) Sending counter to hardware: 3
+[18.46.13.627] [DEBUG] <0xf0> (main.cpp:10) Starting hardware simulation with target: 3
+[18.46.13.956] [DEBUG] <0xe4> (middleWhere.cpp:53) Key blocked: 65
+[18.46.13.962] [DEBUG] <0xf0> (main.cpp:15) Hardware simulation complete for target: 3
+[18.46.13.963] [INFO] <0xf0> (main.cpp:26) Receiving verification from hardware
+[18.46.13.964] [INFO] <0xf0> (middleWhere.cpp:31) Hardware verification successful for key: 65
+[18.46.14.953] [INFO] <0xe4> (middleWhere.cpp:57) Registered key pressed: 68
+[18.46.14.954] [INFO] <0xf0> (middleWhere.cpp:23) Processing key response for key: 68 with target counter: 4
+[18.46.14.955] [INFO] <0xf0> (main.cpp:21) Sending counter to hardware: 4
+[18.46.14.957] [DEBUG] <0xf0> (main.cpp:10) Starting hardware simulation with target: 4
+[18.46.15.370] [DEBUG] <0xf0> (main.cpp:15) Hardware simulation complete for target: 4
+[18.46.15.371] [INFO] <0xf0> (main.cpp:26) Receiving verification from hardware
+[18.46.15.371] [INFO] <0xf0> (middleWhere.cpp:31) Hardware verification successful for key: 68
+[18.46.15.922] [INFO] <0xe4> (middleWhere.cpp:57) Registered key pressed: 32
+[18.46.15.923] [INFO] <0xf8> (middleWhere.cpp:23) Processing key response for key: 32 with target counter: 10
+[18.46.15.924] [INFO] <0xf8> (main.cpp:21) Sending counter to hardware: 10
+[18.46.15.926] [DEBUG] <0xf8> (main.cpp:10) Starting hardware simulation with target: 10
