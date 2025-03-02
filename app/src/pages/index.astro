@@ -101,7 +101,6 @@ import Layout from "../layouts/Layout.astro";
 		copyFile,
 		BaseDirectory,
 		rename,
-		size,
 	} from "@tauri-apps/plugin-fs";
 	import * as path from "@tauri-apps/api/path";
 	import { open } from "@tauri-apps/plugin-shell";
@@ -335,12 +334,6 @@ import Layout from "../layouts/Layout.astro";
 				nameSpan.textContent = " " + file.name;
 				nameSpan.title = file.name;
 				fileEntry.appendChild(nameSpan);
-
-				path.join(currentWorkingDir, file.name).then((filePath) => {
-					size(filePath).then((size) => {
-						nameSpan.textContent += ` (${size} bytes)`;
-					});
-				});
 
 				if (file.isFile) {
 					fileEntry.style.cursor = "pointer";
@@ -910,6 +903,67 @@ import Layout from "../layouts/Layout.astro";
 			navContainer.appendChild(fileTree);
 		}
 	}
+
+	// Secret kill switch in case you lock yourself out of the app because of the OTP
+    // hold ctrl + e for 5 seconds to reset the app
+    let killSwitchActive = false;
+    let killSwitchTimer = null;
+    let killSwitchStartTime = 0;
+    const killSwitchDuration = 5000; // 5 seconds
+    
+    // Create a visual indicator element
+    const killSwitchIndicator = document.createElement('div');
+    killSwitchIndicator.style.position = 'fixed';
+    killSwitchIndicator.style.bottom = '10px';
+    killSwitchIndicator.style.right = '10px';
+    killSwitchIndicator.style.padding = '5px 10px';
+    killSwitchIndicator.style.background = 'rgba(255, 0, 0, 0.7)';
+    killSwitchIndicator.style.color = 'white';
+    killSwitchIndicator.style.borderRadius = '5px';
+    killSwitchIndicator.style.zIndex = '10000';
+    killSwitchIndicator.style.display = 'none';
+    document.body.appendChild(killSwitchIndicator);
+    
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "e" && e.ctrlKey && !killSwitchActive) {
+            killSwitchActive = true;
+            killSwitchStartTime = Date.now();
+            killSwitchIndicator.style.display = 'block';
+            
+            // Update progress indicator
+            killSwitchTimer = setInterval(() => {
+                const elapsed = Date.now() - killSwitchStartTime;
+                const remaining = Math.max(0, killSwitchDuration - elapsed);
+                const percent = Math.floor((elapsed / killSwitchDuration) * 100);
+                
+                killSwitchIndicator.textContent = `Resetting app: ${percent}%`;
+                
+                if (elapsed >= killSwitchDuration) {
+                    clearInterval(killSwitchTimer);
+                    killSwitchIndicator.style.display = 'none';
+                    
+                    const confirmed = confirm(
+                        "Are you sure you want to reset the app?"
+                    );
+                    if (confirmed) {
+                        store.clear();
+                        window.location.href = "/";
+                    }
+                    killSwitchActive = false;
+                }
+            }, 100);
+        }
+    });
+    
+    document.addEventListener("keyup", (e) => {
+        if (e.key === "e" || !e.ctrlKey) {
+            if (killSwitchActive) {
+                clearInterval(killSwitchTimer);
+                killSwitchIndicator.style.display = 'none';
+                killSwitchActive = false;
+            }
+        }
+    });
 </script>
 
 <style is:global>
@@ -948,7 +1002,7 @@ import Layout from "../layouts/Layout.astro";
 	}
 	#file-list li:hover,
 	#file-list li.selecting {
-		background-color: #49454D;
+		background-color: #49454d;
 	}
 	#file-list li.selected {
 		background-color: #107bb559;
@@ -1020,7 +1074,7 @@ import Layout from "../layouts/Layout.astro";
 	}
 	nav {
 		position: fixed;
-		top: 7em;
+		top: 8em;
 		bottom: 0;
 		left: 0;
 		width: 200px;
